@@ -2,7 +2,7 @@
   php = "8.2"
 
 [phases.setup]
-  nixPkgs = ["php82", "php82Extensions.gd", "php82Extensions.zip", "php82Extensions.bcmath", "php82Extensions.intl", "php82Packages.composer", "nodejs"]
+  nixPkgs = ["php82", "php82Extensions.gd", "php82Extensions.zip", "php82Extensions.bcmath", "php82Extensions.intl", "php82Extensions.pdo_pgsql", "php82Packages.composer", "nodejs"]
 
 [phases.install]
   cmds = [
