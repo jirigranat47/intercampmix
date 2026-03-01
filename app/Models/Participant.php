@@ -17,4 +17,9 @@ class Participant extends Model
         'original_group_id',
         'target_group'
     ];
+
+    public function originalGroup()
+    {
+        return $this->belongsTo(OriginalGroup::class, 'original_group_id', 'order_number');
+    }
 }

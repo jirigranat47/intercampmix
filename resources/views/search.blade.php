@@ -1,7 +1,5 @@
 @extends('layout')
 
-@yield('title', 'Najdi svou skupinu')
-
 @section('content')
 <div class="max-w-md mx-auto">
     <div class="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100">
@@ -33,27 +31,26 @@
             @endif
 
             @if(isset($participant))
-                <div class="mt-10 p-1 bg-gradient-to-br from-green-400 to-blue-500 rounded-3xl shadow-2xl overflow-hidden transform hover:scale-105 transition-all">
+                <div class="mt-10 p-1 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl shadow-2xl overflow-hidden transform hover:scale-105 transition-all">
                     <div class="bg-white rounded-[1.4rem] p-8 text-center">
-                        <div class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-2">Tvá cílová skupina je:</div>
-                        <div class="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-blue-700 mb-4 font-mono">
-                            {{ $participant->target_group }}
+                        <div class="inline-block px-4 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-bold tracking-widest uppercase mb-6">
+                            Subcamp {{ $participant->originalGroup->subcamp ?? '?' }}
+                        </div>
+
+                        <div class="mb-6">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-1 block">Troop Name / Název týmu</span>
+                            <h2 class="text-4xl font-black text-gray-900 leading-tight">
+                                {{ $participant->originalGroup->troop_name ?? 'Neznámý tým' }}
+                            </h2>
                         </div>
                         
-                        <div class="pt-6 border-t border-gray-100 mt-6 grid grid-cols-2 gap-4">
-                            <div class="text-left">
-                                <span class="block text-xs text-gray-400 uppercase">Jméno</span>
-                                <span class="font-bold">{{ $participant->first_name }} {{ $participant->last_name }}</span>
-                            </div>
-                            <div class="text-left">
-                                <span class="block text-xs text-gray-400 uppercase">Země</span>
-                                <span class="font-bold">{{ $participant->country }}</span>
+                        <div class="mb-8">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-1 block">Nationality / Národnost</span>
+                            <div class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 uppercase tracking-wider">
+                                {{ $participant->country }}
                             </div>
                         </div>
                         
-                        <div class="mt-6 text-sm text-gray-500">
-                             Nezapomeň si tento název zapamatovat!
-                        </div>
                     </div>
                 </div>
             @endif
