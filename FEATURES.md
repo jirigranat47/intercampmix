@@ -44,6 +44,7 @@ Tento dokument slouží jako přehled aktuálních funkcí aplikace a historie z
 - **OPRAVENO:** Chybějící PHP ovladač pro PostgreSQL na Railway (`pdo_pgsql`).
 - **OPRAVENO:** Chyba `invalid value for parameter "client_encoding": "utf8mb4"` při startu Postgres.
 - **OPRAVENO:** Detekce subcampů z Excelu pomocí regulárních výrazů.
+- **OPRAVENO:** Varování prohlížeče o "nezabezpečeném odesílání" vynucením HTTPS v produkci.
 - **ZMĚNA:** Povýšení PHP na 8.2 z důvodu požadavků Railway Railpacku.
 - **ZMĚNA:** Přechod z `master` větve na `main`.
 
