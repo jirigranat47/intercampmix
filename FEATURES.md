@@ -15,11 +15,12 @@ Tento dokument slouží jako přehled aktuálních funkcí aplikace a historie z
 - **Deterministický přístup:** Algoritmus nepoužívá náhodu, výsledek je při stejných datech vždy stejný.
 - **Dekompozice:** Rozdělení původních skupin na "balíčky" po 2 až 3 dětech (Krok A).
 - **Round-Robin Interleaving:** Střídání zemí v řadě pro maximální mezinárodní diverzitu (Krok B & C).
-- **Strategické umisťování:** Plnění cílových 10členných skupin s hlídáním unikátnosti původní skupiny (Krok D).
-- **Fallback mechanizmus:** Pokud nelze dodržet unikátnost skupiny na konci subcampu, systém automaticky upřednostní naplnění kapacity.
+- **Tiered Assignment (Umisťování):** Čtyřúrovňová logika plnění 10členných skupin s prioritou na: (1. unikátní NR + unikátní Skupina), (2. jen unikátní Skupina), (3. volné místo), (4. absolutní fallback při přetečení).
+- **Fallback mechanizmus:** Pokud nelze dodržet unikátnost skupiny nebo národnosti na konci subcampu, systém automaticky upřednostní naplnění kapacity.
 
 ### 3. Modul Exportu a Prohlížení
 - **CSV Export:** Stahování kompletního výsledku ve formátu CSV (středníkový oddělovač, UTF-8 BOM pro Excel).
+- **Statistiky úspešnosti:** Přehled kolik dětí se podařilo rozřadit do "ideálních" (Tier 1) vs "fallback" skupin přímo po spuštění.
 - **DB Inspector:** Interní webový prohlížeč pro kontrolu obsahu tabulek `OriginalGroup` a `Participant` přímo v administraci.
 
 ### 4. Infrastruktura
@@ -33,6 +34,9 @@ Tento dokument slouží jako přehled aktuálních funkcí aplikace a historie z
 
 ### [2026-03-01] - Aktuální stav
 - **PŘIDÁNO:** Realizován kompletní míchací algoritmus (Krok A-D).
+- **PŘIDÁNO:** Implementována "Tiered" logika pro míchání národností (prioritizace unikátnosti země v rámci cílové skupiny).
+- **PŘIDÁNO:** Rozšířeny statistiky míchání o reportování Tiers (Ideální / Jen skupina / Fallback).
+- **PŘIDÁNO:** Skript `analyze.php` pro hloubkovou kontrolu diverzity výsledků.
 - **PŘIDÁNO:** Implementován export do CSV se semicolon (;) oddělovačem.
 - **PŘIDÁNO:** Vytvořena stránka "Prohlížeč databáze" pro adminy.
 - **PŘIDÁNO:** Konfigurace pro nasazení na Railway.app (`nixpacks.toml`).

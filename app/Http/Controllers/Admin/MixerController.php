@@ -27,14 +27,15 @@ class MixerController extends Controller
         foreach ($subcamps as $scLabel) {
             $service = new MixerService($scLabel);
             $outcome = $service->mix();
+            $stats = $outcome['stats'];
             
-            $results[] = "Subcamp {$scLabel}: {$outcome['stats']['groups_created']} skupin / {$outcome['stats']['total_children']} dětí.";
-            $totalFallbacks += $outcome['stats']['fallbacks_used'];
+            $results[] = "Subcamp {$scLabel}: {$stats['groups_created']} skupin / {$stats['total_children']} dětí (Ideální: {$stats['tier1']}, Jen skupina: {$stats['tier2']}, Fallback: {$stats['tier3']}, Přeteklo: {$stats['tier4']}).";
+            $totalFallbacks += ($stats['tier3'] + $stats['tier4']);
         }
 
         $msg = "Úspěšně rozřazeno! " . implode(" ", $results);
         if ($totalFallbacks > 0) {
-            $msg .= " (Upozornění: Pravidlo o unikátnosti původní skupiny muselo být $totalFallbacks krát na konci prolomeno [Fallback]).";
+            $msg .= " (Upozornění: Pravidlo o unikátnosti původní skupiny nebo národnosti muselo být $totalFallbacks krát na konci prolomeno [Fallback]).";
         }
 
         return back()->with('success', $msg);

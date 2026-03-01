@@ -144,63 +144,83 @@ class MixerService
             $buckets[$bucketName] = [
                 'name' => $bucketName,
                 'size' => 0,
-                'original_groups_inside' => [], // tracking for Priority 3 constraint
+                'original_groups_inside' => [], // tracking for Priority group constraint
+                'countries_inside' => [],       // tracking for Nationality diversity
                 'bundles' => []
             ];
         }
 
-        $fallbacksTriggered = 0;
+        $stats = [
+            'total_children' => $totalKids,
+            'groups_created' => $bucketCount,
+            'tier1' => 0, // Ideal: No OG, No Country
+            'tier2' => 0, // Good: No OG
+            'tier3' => 0, // Fallback: Space only
+            'tier4' => 0  // Overfill: No space anywhere
+        ];
 
         foreach ($interleavedBundles as $bundle) {
             $placedBucketName = null;
             $bundleSize = $bundle->getSize();
 
-            // 1. Najít ideální kbelíky (má místo A ZÁROVEŇ neni v něm původní skupina)
-            $validBuckets = [];
+            // TIER 1: Najlepší kbelík (má místo A ZÁROVEŇ v něm není původní skupina A ZÁROVEŇ v něm není stejná národnost)
+            $tier1Buckets = [];
             foreach ($buckets as $name => $bucket) {
                 if ($bucket['size'] + $bundleSize <= 10) {
                     if (!in_array($bundle->originalGroupId, $bucket['original_groups_inside'])) {
-                        $validBuckets[$name] = $bucket;
+                        if (!in_array($bundle->country, $bucket['countries_inside'])) {
+                            $tier1Buckets[$name] = $bucket;
+                        }
                     }
                 }
             }
 
-            if (!empty($validBuckets)) {
-                // Z Validních najít ten nejprázdnější (Priorita 2)
-                uasort($validBuckets, function($a, $b) {
-                    return $a['size'] <=> $b['size'];
-                });
-                $placedBucketName = array_key_first($validBuckets);
+            if (!empty($tier1Buckets)) {
+                // Z Tier 1 najít nejprázdnější
+                uasort($tier1Buckets, function($a, $b) { return $a['size'] <=> $b['size']; });
+                $placedBucketName = array_key_first($tier1Buckets);
+                $stats['tier1']++;
             } else {
-                // FALLBACK
-                // 2. Pokud se nenašel vyhovující, vypneme "ZÁROVEŇ neni původní skupina"
-                // prostě bereme cokoliv kde je místo, i nad povolených 10 pokud nelze jinak?
-                $fallbacksTriggered++;
-                
-                $anyPlaceBuckets = [];
+                // TIER 2: Dobrý kbelík (má místo A ZÁROVEŇ v něm není původní skupina, ale národnost už tam může být)
+                $tier2Buckets = [];
                 foreach ($buckets as $name => $bucket) {
                     if ($bucket['size'] + $bundleSize <= 10) {
-                        $anyPlaceBuckets[$name] = $bucket;
+                        if (!in_array($bundle->originalGroupId, $bucket['original_groups_inside'])) {
+                            $tier2Buckets[$name] = $bucket;
+                        }
                     }
                 }
 
-                if (!empty($anyPlaceBuckets)) {
-                    uasort($anyPlaceBuckets, function($a, $b) {
-                        return $a['size'] <=> $b['size'];
-                    });
-                    $placedBucketName = array_key_first($anyPlaceBuckets);
+                if (!empty($tier2Buckets)) {
+                    uasort($tier2Buckets, function($a, $b) { return $a['size'] <=> $b['size']; });
+                    $placedBucketName = array_key_first($tier2Buckets);
+                    $stats['tier2']++;
                 } else {
-                    // ÚPLNÝ FALLBACK: Žádný kbelík nemá místo do 10, nacpeme to k někomu komu se to líbí nejméně aby přetekli jen o málo
-                    uasort($buckets, function($a, $b) {
-                        return $a['size'] <=> $b['size'];
-                    });
-                    $placedBucketName = array_key_first($buckets);
+                    // TIER 3: Má místo (ale porušuje OG nebo národnost)
+                    $tier3Buckets = [];
+                    foreach ($buckets as $name => $bucket) {
+                        if ($bucket['size'] + $bundleSize <= 10) {
+                            $tier3Buckets[$name] = $bucket;
+                        }
+                    }
+
+                    if (!empty($tier3Buckets)) {
+                        uasort($tier3Buckets, function($a, $b) { return $a['size'] <=> $b['size']; });
+                        $placedBucketName = array_key_first($tier3Buckets);
+                        $stats['tier3']++;
+                    } else {
+                        // TIER 4: ÚPLNÝ FALLBACK (přetečení přes 10)
+                        $stats['tier4']++;
+                        uasort($buckets, function($a, $b) { return $a['size'] <=> $b['size']; });
+                        $placedBucketName = array_key_first($buckets);
+                    }
                 }
             }
 
             // Samotné vložení do kbelíku
             $buckets[$placedBucketName]['size'] += $bundleSize;
             $buckets[$placedBucketName]['original_groups_inside'][] = $bundle->originalGroupId;
+            $buckets[$placedBucketName]['countries_inside'][] = $bundle->country;
             $buckets[$placedBucketName]['bundles'][] = $bundle;
         }
 
@@ -214,10 +234,6 @@ class MixerService
             }
         }
 
-        return [
-            'total_children' => $totalKids,
-            'groups_created' => $bucketCount,
-            'fallbacks_used' => $fallbacksTriggered
-        ];
+        return $stats;
     }
 }
