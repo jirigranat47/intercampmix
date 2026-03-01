@@ -15,10 +15,9 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 
-        (strpos(env('DATABASE_URL', ''), 'postgres') !== false || strpos(getenv('DATABASE_URL'), 'postgres') !== false) 
-            ? 'pgsql' : 'mysql'
-    ),
+    'default' => (strpos(env('DATABASE_URL', ''), 'postgres') !== false || strpos(getenv('DATABASE_URL'), 'postgres') !== false) 
+        ? 'pgsql' 
+        : env('DB_CONNECTION', 'mysql'),
 
     /*
     |--------------------------------------------------------------------------
