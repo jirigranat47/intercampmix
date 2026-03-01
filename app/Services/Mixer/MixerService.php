@@ -127,13 +127,12 @@ class MixerService
     private function assignToTargetGroups(array $interleavedBundles): array
     {
         // Spočítáme si celkový počet lidí abychom zjistili, kolik kbelíků (groups) skutečně založit pro tento subcamp.
-        // Cíl je aby kapacity byly co nejblíže 10.
         $totalKids = 0;
         foreach ($interleavedBundles as $bundle) {
             $totalKids += $bundle->getSize();
         }
 
-        $bucketCount = (int) ceil($totalKids / 10.0);
+        $bucketCount = (int) ceil($totalKids / 8.0);
         if ($bucketCount === 0) return [];
 
         // Inicializujeme kbelíky ("A1".. "Z9" atd.)
@@ -166,7 +165,7 @@ class MixerService
             // TIER 1: Najlepší kbelík (má místo A ZÁROVEŇ v něm není původní skupina A ZÁROVEŇ v něm není stejná národnost)
             $tier1Buckets = [];
             foreach ($buckets as $name => $bucket) {
-                if ($bucket['size'] + $bundleSize <= 10) {
+                if ($bucket['size'] + $bundleSize <= 8) {
                     if (!in_array($bundle->originalGroupId, $bucket['original_groups_inside'])) {
                         if (!in_array($bundle->country, $bucket['countries_inside'])) {
                             $tier1Buckets[$name] = $bucket;
@@ -184,7 +183,7 @@ class MixerService
                 // TIER 2: Dobrý kbelík (má místo A ZÁROVEŇ v něm není původní skupina, ale národnost už tam může být)
                 $tier2Buckets = [];
                 foreach ($buckets as $name => $bucket) {
-                    if ($bucket['size'] + $bundleSize <= 10) {
+                    if ($bucket['size'] + $bundleSize <= 8) {
                         if (!in_array($bundle->originalGroupId, $bucket['original_groups_inside'])) {
                             $tier2Buckets[$name] = $bucket;
                         }
@@ -199,7 +198,7 @@ class MixerService
                     // TIER 3: Má místo (ale porušuje OG nebo národnost)
                     $tier3Buckets = [];
                     foreach ($buckets as $name => $bucket) {
-                        if ($bucket['size'] + $bundleSize <= 10) {
+                        if ($bucket['size'] + $bundleSize <= 8) {
                             $tier3Buckets[$name] = $bucket;
                         }
                     }
@@ -226,10 +225,13 @@ class MixerService
 
         // FINÁLNÍ ZÁPIS DO DB
         foreach ($buckets as $bucket) {
+            $ordinal = 1;
             foreach ($bucket['bundles'] as $bundle) {
                 foreach ($bundle->participants as $participant) {
                     $participant->target_group = $bucket['name'];
+                    $participant->registration_code = $bucket['name'] . "_" . $ordinal;
                     $participant->save();
+                    $ordinal++;
                 }
             }
         }

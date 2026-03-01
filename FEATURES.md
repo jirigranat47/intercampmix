@@ -15,7 +15,8 @@ Tento dokument slouží jako přehled aktuálních funkcí aplikace a historie z
 - **Deterministický přístup:** Algoritmus nepoužívá náhodu, výsledek je při stejných datech vždy stejný.
 - **Dekompozice:** Rozdělení původních skupin na "balíčky" po 2 až 3 dětech (Krok A).
 - **Round-Robin Interleaving:** Střídání zemí v řadě pro maximální mezinárodní diverzitu (Krok B & C).
-- **Tiered Assignment (Umisťování):** Čtyřúrovňová logika plnění 10členných skupin s prioritou na: (1. unikátní NR + unikátní Skupina), (2. jen unikátní Skupina), (3. volné místo), (4. absolutní fallback při přetečení).
+- **Strategické umisťování:** Plnění cílových 8členných skupin s hlídáním unikátnosti původní skupiny (Krok D).
+- **Unikátní ID účastníka:** Po rozřazení je každému dítěti přidělen kód ve formátu `SC{subcamp}_G{group}_{pořadí}` (např. `SC1_G01_1`), který jednoznačně identifikuje jeho pozici ve skupině.
 - **Fallback mechanizmus:** Pokud nelze dodržet unikátnost skupiny nebo národnosti na konci subcampu, systém automaticky upřednostní naplnění kapacity.
 
 ### 3. Modul Exportu a Prohlížení

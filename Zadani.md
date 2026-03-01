@@ -1,7 +1,7 @@
 # Projekt: International Mixer – Rozřazovací Algoritmus
 
 ## 1. Popis projektu
-Cílem aplikace je spravedlivé a strategické rozdělení 900 dětí do 90 cílových skupin (každá po 10 dětech). Hlavním kritériem je **maximální mezinárodní diverzita** a zajištění, aby děti z jedné země (a zejména z jedné konkrétní vyslané skupiny) byly co nejvíce promíchány s ostatními.
+Cílem aplikace je spravedlivé a strategické rozdělení účastníků do cílových skupin (každá po 8 dětech). Hlavním kritériem je **maximální mezinárodní diverzita** a zajištění, aby děti z jedné země (a zejména z jedné konkrétní vyslané skupiny) byly co nejvíce promíchány s ostatními.
 
 ## 2. Klíčové funkce
 ### Administrační modul (Admin)
@@ -23,7 +23,7 @@ Algoritmus nepoužívá náhodné míchání (`shuffle`), aby byla zajištěna m
 Každá vstupní skupina (max. 20 dětí) je rozdělena na menší nedělitelné celky:
 1.  Pokud je počet dětí v původní skupině sudý, rozdělí se na **dvojice**.
 2.  Pokud je lichý, vytvoří se **jedna trojice** a zbytek jsou **dvojice**.
-*Tím je zajištěno, že žádné dítě nezůstane samo a zároveň lze z balíčků o velikosti 2 a 3 vždy poskládat cílovou skupinu o 10 lidech.*
+*Tím je zajištěno, že žádné dítě nezůstane samo a zároveň lze z balíčků o velikosti 2 a 3 vždy poskládat cílovou skupinu o 8 lidech (např. 3+3+2 nebo 2+2+2+2).*
 
 ### Krok B: Třídění podle zemí (Queuing)
 Všechny vytvořené balíčky se seřadí do front podle země původu. Vznikne tak několik front (např. fronta Česko, fronta Německo, fronta Polsko...).
@@ -35,7 +35,7 @@ Vytvoří se jeden hlavní seznam balíčků k rozřazení metodou "kolem dokola
 * **Výsledek:** Seznam, kde za sebou jdou balíčky z různých zemí v pravidelném rytmu.
 
 ### Krok D: Plnění cílových skupin (Placement)
-Algoritmus prochází proložený seznam balíčků a umisťuje je do 90 prázdných slotů (A1 až I10) podle těchto pravidel:
+Algoritmus prochází proložený seznam balíčků a umisťuje je do cílových skupin (SCx_Gxx) podle těchto pravidel:
 1.  **Priorita plnění:** Balíček se přednostně dává do skupiny, která má aktuálně nejméně dětí.
 2.  **Kontrola duplicity původu:** Do jedné cílové skupiny nesmí být umístěny dva balíčky, které pocházejí ze **stejné původní vstupní skupiny** (i kdyby to byla stejná země).
 3.  **Fallback:** Pokud by pravidlo č. 2 znemožnilo dokončení algoritmu (v závěrečné fázi), pravidlo se uvolní a balíček se umístí do první volné skupiny s kapacitou.
