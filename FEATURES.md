@@ -34,6 +34,7 @@ Tento dokument slouží jako přehled aktuálních funkcí aplikace a historie z
 
 ### [2026-03-01] - Aktuální stav
 - **PŘIDÁNO:** Realizován kompletní míchací algoritmus (Krok A-D).
+- **PŘIDÁNO:** Stránka se statistikami národností rozdělených podle subcampů.
 - **PŘIDÁNO:** Implementována "Tiered" logika pro míchání národností (prioritizace unikátnosti země v rámci cílové skupiny).
 - **PŘIDÁNO:** Rozšířeny statistiky míchání o reportování Tiers (Ideální / Jen skupina / Fallback).
 - **PŘIDÁNO:** Skript `analyze.php` pro hloubkovou kontrolu diverzity výsledků.

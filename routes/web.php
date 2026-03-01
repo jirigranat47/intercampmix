@@ -24,3 +24,4 @@ Route::get('/admin/db', [App\Http\Controllers\Admin\DBViewerController::class, '
 
 Route::post('/admin/mix', [App\Http\Controllers\Admin\MixerController::class, 'runAlgorithm'])->name('admin.mix.process');
 Route::get('/admin/export', [App\Http\Controllers\Admin\MixerController::class, 'export'])->name('admin.export.process');
+Route::get('/admin/stats', [App\Http\Controllers\Admin\StatsController::class, 'index'])->name('admin.stats');

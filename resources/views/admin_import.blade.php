@@ -66,4 +66,20 @@
         </div>
     </div>
 </div>
+
+<div class="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6 mb-8 max-w-3xl">
+    <div class="md:grid md:grid-cols-3 md:gap-6">
+        <div class="md:col-span-1">
+            <h3 class="text-lg font-medium leading-6 text-gray-900">Statistiky</h3>
+            <p class="mt-1 text-sm text-gray-500">
+                Zobrazit rozdělení národností v subcampech.
+            </p>
+        </div>
+        <div class="mt-5 md:mt-0 md:col-span-2">
+            <a href="{{ route('admin.stats') }}" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Zobrazit Statistiky Národností
+            </a>
+        </div>
+    </div>
+</div>
 @endsection
