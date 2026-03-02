@@ -19,17 +19,26 @@ class DBViewerController extends Controller
         }
         $groups = $groupsQuery->get();
 
-        $participantsQuery = Participant::orderBy('target_group');
+        $targetGroupsQuery = Participant::whereNotNull('target_group')->select('target_group')->distinct()->orderBy('target_group');
         if ($selectedSubcamp) {
-            $participantsQuery->whereHas('originalGroup', function($q) use ($selectedSubcamp) {
+            $targetGroupsQuery->whereHas('originalGroup', function($q) use ($selectedSubcamp) {
                 $q->where('subcamp', $selectedSubcamp);
             });
         }
         
-        $participants = $participantsQuery->paginate(100)->withQueryString();
+        $targetGroups = $targetGroupsQuery->get();
+        
+        $targetGroupNames = $targetGroups->pluck('target_group');
+        $participantsByGroup = Participant::whereIn('target_group', $targetGroupNames)
+            ->with('originalGroup')
+            ->orderBy('target_group')
+            ->orderBy('is_leader', 'desc') // Vedoucí napřed
+            ->get()
+            ->groupBy('target_group');
+
         $totalParticipants = Participant::count();
         $allSubcamps = OriginalGroup::select('subcamp')->distinct()->orderBy('subcamp')->pluck('subcamp');
 
-        return view('admin_db', compact('groups', 'participants', 'totalParticipants', 'allSubcamps', 'selectedSubcamp'));
+        return view('admin_db', compact('groups', 'targetGroups', 'participantsByGroup', 'totalParticipants', 'allSubcamps', 'selectedSubcamp'));
     }
 }

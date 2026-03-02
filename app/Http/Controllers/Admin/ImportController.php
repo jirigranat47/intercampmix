@@ -77,8 +77,19 @@ class ImportController extends Controller
                     continue; // Skip if nothing in the group
                 }
 
+                // Generate a unique key for the group based on order number and part of troop name
+                // if order_number is shared. We handle it before firstOrCreate to use it directly.
+                $uniqueOrderNumber = $orderNumber;
+                // Check if this order_number is already in DB for a DIFFERENT troop
+                $existingWithSameOrder = OriginalGroup::where('order_number', $uniqueOrderNumber)->first();
+                if ($existingWithSameOrder && $existingWithSameOrder->troop_name !== $troopName) {
+                    // Suffix it to make it unique for mixer references using the full troop name
+                $slug = Str::slug($troopName);
+                $uniqueOrderNumber = $orderNumber . '-' . strtoupper($slug);
+                }
+
                 $group = OriginalGroup::firstOrCreate(
-                    ['order_number' => $orderNumber],
+                    ['order_number' => $uniqueOrderNumber],
                     [
                         'country' => $country,
                         'subcamp' => $subcamp,
@@ -90,6 +101,10 @@ class ImportController extends Controller
                 
                 if ($group->subcamp === 1 && $subcamp !== 1) {
                     $group->subcamp = $subcamp;
+                }
+                // Ensure country is updated if it was previously unknown
+                if ($group->country === 'Unknown' && $country !== 'Unknown') {
+                    $group->country = $country;
                 }
                 
                 $group->number_of_children += $numChildren;

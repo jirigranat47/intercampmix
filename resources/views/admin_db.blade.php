@@ -76,52 +76,67 @@
 <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
     <div class="px-4 py-5 sm:px-6">
         <h3 class="text-lg leading-6 font-medium text-gray-900">
-            Tabulka: Participants (Jednotlivé vygenerované děti a vedoucí)
+            Tabulka: Vygenerované Cílové Skupiny (Target Groups)
         </h3>
         <p class="mt-1 max-w-2xl text-sm text-gray-500">
-            Zobrazeno {{ $participants->count() }} záznamů (Stránka {{ $participants->currentPage() }} z {{ $participants->lastPage() }})
+            Zobrazeno {{ $targetGroups->count() }} celkových skupin.
         </p>
     </div>
-    <div class="border-t border-gray-200">
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Typ</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID / Kód</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Země / Původní Skupina</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Target Group</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    @foreach($participants as $p)
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            @if($p->is_leader)
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Vedoucí</span>
-                            @else
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Dítě</span>
+
+    <div class="border-t border-gray-200 bg-gray-50 p-4">
+        
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            @foreach($targetGroups as $tg)
+                @php 
+                    $groupName = $tg->target_group;
+                    // Sort members so Leaders ('_X') come first, then regular members by code
+                    $members = $participantsByGroup->get($groupName, collect())->sortBy(function($p) {
+                        return $p->is_leader ? '0_' . $p->registration_code : '1_' . $p->registration_code;
+                    });
+                    $leaderCount = $members->where('is_leader', true)->count();
+                    $kidCount = $members->where('is_leader', false)->count();
+                @endphp
+                <div class="bg-white overflow-hidden shadow rounded-lg border border-gray-200">
+                    <div class="px-4 py-3 border-b border-gray-200 bg-gray-100 flex justify-between items-center">
+                        <h4 class="text-md font-bold text-indigo-700">{{ $groupName }}</h4>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                            {{ $leaderCount }} + {{ $kidCount }} Členů
+                        </span>
+                    </div>
+                    <div class="px-4 py-3">
+                        <ul role="list" class="divide-y divide-gray-200">
+                            @foreach($members as $p)
+                                <li class="py-2 flex">
+                                    <div class="ml-3 flex-1 flex flex-col">
+                                        <div class="flex justify-between items-center">
+                                            <p class="text-sm font-medium text-gray-900">
+                                                {{ $p->first_name }} {{ $p->last_name }} 
+                                            </p>
+                                            @if($p->is_leader)
+                                                <span class="px-2 inline-flex text-[10px] leading-4 font-semibold rounded-sm bg-blue-100 text-blue-800">Vedoucí</span>
+                                            @endif
+                                        </div>
+                                        <div class="flex justify-between mt-1 text-xs text-gray-500">
+                                            <span>{{ $p->country }}</span>
+                                            <span class="text-gray-400">Ord: {{ $p->original_group_id }} | {{ $p->registration_code }}</span>
+                                        </div>
+                                    </div>
+                                </li>
+                            @endforeach
+                            @if($members->isEmpty())
+                                <p class="text-xs text-gray-500 text-center py-2">Žádní účastníci</p>
                             @endif
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {{ $p->registration_code }}<br>
-                            <span class="text-xs text-gray-400">{{ $p->first_name }} {{ $p->last_name }}</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ $p->country }}<br>
-                            <span class="text-xs text-gray-400">Order: {{ $p->original_group_id }}</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold {{ $p->target_group ? 'text-green-600' : 'text-gray-400' }}">
-                            {{ $p->target_group ?? 'Nepřiřazeno' }}
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                        </ul>
+                    </div>
+                </div>
+            @endforeach
         </div>
-        <div class="px-4 py-3 bg-gray-50 border-t border-gray-200 sm:px-6">
-            {{ $participants->links() }}
-        </div>
+
+        @if($targetGroups->isEmpty())
+            <div class="text-center py-8 text-gray-500">
+                Nebyly nalezeny žádné cílové skupiny. Zkuste spustit rozřazovací algoritmus.
+            </div>
+        @endif
     </div>
 </div>
 @endsection

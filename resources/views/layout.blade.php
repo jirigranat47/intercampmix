@@ -19,7 +19,7 @@
                     <div class="ml-10 flex items-baseline space-x-4">
                         <a href="/" class="hover:bg-blue-700 px-3 py-2 rounded-md text-sm font-medium">Veřejné hledání</a>
                         <a href="{{ route('admin.import') }}" class="hover:bg-blue-700 px-3 py-2 rounded-md text-sm font-medium">Administrace/Nahrávání</a>
-                        <a href="{{ route('admin.db') }}" class="hover:bg-blue-700 px-3 py-2 rounded-md text-sm font-medium text-blue-200">🔍 Prohlížet Databázi</a>
+                        <a href="{{ route('admin.db') }}" class="hover:bg-blue-700 px-3 py-2 rounded-md text-sm font-medium text-blue-200">🔍 Prohlížet databázi</a>
                     </div>
                 </div>
                 <div class="-mr-2 flex md:hidden">
@@ -41,7 +41,7 @@
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                 <a href="/" class="hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">Veřejné hledání</a>
                 <a href="{{ route('admin.import') }}" class="hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">Administrace/Nahrávání</a>
-                <a href="{{ route('admin.db') }}" class="hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium text-blue-200">🔍 Prohlížet Databázi</a>
+                <a href="{{ route('admin.db') }}" class="hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium text-blue-200">🔍 Prohlížet databázi</a>
             </div>
         </div>
     </nav>

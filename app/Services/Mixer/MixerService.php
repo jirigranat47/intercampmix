@@ -129,7 +129,9 @@ class MixerService
             $totalKids += $bundle->getSize();
         }
 
-        $bucketCount = (int) ceil($totalKids / 8.0);
+        // Maximálně 8 dětí do skupiny (aby s jedním vedoucím bylo max 9 osob celkem)
+        $maxKidsPerBucket = 8;
+        $bucketCount = (int) ceil($totalKids / (float)$maxKidsPerBucket);
         if ($bucketCount === 0) return ['buckets' => [], 'stats' => []];
 
         $buckets = [];
@@ -160,7 +162,7 @@ class MixerService
 
             $tier1Buckets = [];
             foreach ($buckets as $name => $bucket) {
-                if ($bucket['size'] + $bundleSize <= 8) {
+                if ($bucket['size'] + $bundleSize <= $maxKidsPerBucket) {
                     if (!in_array($bundle->originalGroupId, $bucket['original_groups_inside'])) {
                         if (!in_array($bundle->country, $bucket['countries_inside'])) {
                             $tier1Buckets[$name] = $bucket;
@@ -176,7 +178,7 @@ class MixerService
             } else {
                 $tier2Buckets = [];
                 foreach ($buckets as $name => $bucket) {
-                    if ($bucket['size'] + $bundleSize <= 8) {
+                    if ($bucket['size'] + $bundleSize <= $maxKidsPerBucket) {
                         if (!in_array($bundle->originalGroupId, $bucket['original_groups_inside'])) {
                             $tier2Buckets[$name] = $bucket;
                         }
@@ -190,7 +192,7 @@ class MixerService
                 } else {
                     $tier3Buckets = [];
                     foreach ($buckets as $name => $bucket) {
-                        if ($bucket['size'] + $bundleSize <= 8) {
+                        if ($bucket['size'] + $bundleSize <= $maxKidsPerBucket) {
                             $tier3Buckets[$name] = $bucket;
                         }
                     }
@@ -200,9 +202,36 @@ class MixerService
                         $placedBucketName = array_key_first($tier3Buckets);
                         $stats['tier3']++;
                     } else {
+                        // TIER 4 (Fallback)
+                        // Musíme najít absolutně jakýkoliv bucket, do kterého se vejdou.
                         $stats['tier4']++;
-                        uasort($buckets, function($a, $b) { return $a['size'] <=> $b['size']; });
-                        $placedBucketName = array_key_first($buckets);
+                        $tier4Buckets = [];
+                        foreach ($buckets as $name => $bucket) {
+                            if ($bucket['size'] + $bundleSize <= $maxKidsPerBucket) {
+                                $tier4Buckets[$name] = $bucket;
+                            }
+                        }
+                        
+                        // Pokud už fakt není nikde místo (např. kvůli kombinaci balíčků [3] a [2]),
+                        // musíme vyrobit nový, nouzový bucket, abychom nepřekročili limit!
+                        if (empty($tier4Buckets)) {
+                            $stats['groups_created']++;
+                            $stats['tier4']++; // extra penalty note
+                            $newBucketId = count($buckets) + 1;
+                            $bucketName = "SC" . $this->subcampId . "_G" . str_pad($newBucketId, 2, '0', STR_PAD_LEFT);
+                            $buckets[$bucketName] = [
+                                'name' => $bucketName,
+                                'size' => 0,
+                                'original_groups_inside' => [],
+                                'countries_inside' => [],
+                                'bundles' => [],
+                                'leader' => null
+                            ];
+                            $placedBucketName = $bucketName;
+                        } else {
+                            uasort($tier4Buckets, function($a, $b) { return $a['size'] <=> $b['size']; });
+                            $placedBucketName = array_key_first($tier4Buckets);
+                        }
                     }
                 }
             }
@@ -217,7 +246,7 @@ class MixerService
     }
 
     /**
-     * KROK E: Přiřazení vedoucích
+     * KROK E: Přiřazení vedoucích (v kolech)
      */
     private function assignLeaders(array &$buckets): array
     {
@@ -229,36 +258,102 @@ class MixerService
             ->get()
             ->groupBy('original_group_id');
 
-        $assignedCount = 0;
-        $offDutyCount = 0;
+        $initialLeaderCounts = [];
+        foreach ($allLeaders as $origId => $leaders) {
+            $initialLeaderCounts[$origId] = $leaders->count();
+        }
 
-        foreach ($buckets as &$bucket) {
-            $assigned = false;
+        $emptyBucketIndices = array_keys($buckets);
+        $assignedCount = 0;
+        $round = 1;
+
+        while (!empty($emptyBucketIndices)) {
+            $candidatesToDraft = [];
             
-            // Priorita: Vedoucí z výpravy, která je v kbelíku
-            foreach ($bucket['original_groups_inside'] as $origId) {
-                if (isset($allLeaders[$origId]) && $allLeaders[$origId]->isNotEmpty()) {
-                    $bucket['leader'] = $allLeaders[$origId]->shift();
-                    $assigned = true;
-                    $assignedCount++;
-                    break;
+            // Určení vhodných původních skupin pro toto kolo
+            foreach ($initialLeaderCounts as $origId => $initialCount) {
+                // Runda 1: všichni co mají alespoň 1
+                // Runda 2: všichni co začínali s >= 3
+                // Runda 3: všichni co začínali s >= 4, atd.
+                $minRequired = ($round === 1) ? 1 : ($round + 1);
+                
+                if ($initialCount >= $minRequired && isset($allLeaders[$origId]) && $allLeaders[$origId]->isNotEmpty()) {
+                    $candidatesToDraft[] = $origId;
+                }
+            }
+            
+            // Seřadit kandidáty podle počtu výchozích vedoucích (sestupně),
+            // aby větší skupiny měly jistotu, že dostanou místo dřív, než dojdou volné skupiny.
+            // Pokud dojdou emptyBuckets v tomto kole, vynecháni budou ti s nejméně vedoucími.
+            usort($candidatesToDraft, function($a, $b) use ($initialLeaderCounts) {
+                return $initialLeaderCounts[$b] <=> $initialLeaderCounts[$a];
+            });
+
+            // Pokud v tomto kole už nejsou žádní kandidáti
+            if (empty($candidatesToDraft)) {
+                $totalRemaining = 0;
+                foreach ($allLeaders as $leaders) { 
+                    $totalRemaining += $leaders->count(); 
+                }
+                if ($totalRemaining === 0) {
+                    break; // Už nemáme VŮBEC žádné vedoucí pro naplnění skupin
+                }
+                
+                // Pojistka pro případ, že nějaké nepřiřazené skupiny zbyly, 
+                // ale nikdo už nesplňuje podmínky (např. všichni měli jen po 1 vedoucím).
+                $maxInitial = !empty($initialLeaderCounts) ? max($initialLeaderCounts) : 0;
+                if ($round > $maxInitial) {
+                    // Nouzově vezmeme kohokoliv, kdo ještě zbyl v off-duty (ačkoliv to narušuje pravidlo)
+                    // k dokončení povinného naplnění bucketů
+                    foreach ($allLeaders as $origId => $leaders) {
+                        if ($leaders->isNotEmpty()) {
+                            $candidatesToDraft[] = $origId;
+                        }
+                    }
+                } else {
+                    $round++;
+                    continue; // Skip this round if no one qualifies but we have remaining rounds to check
                 }
             }
 
-            // Fallback: Pokud nikdo z "vlastních" už není, vezmeme kohokoliv volného
-            if (!$assigned) {
-                foreach ($allLeaders as $origId => $leaders) {
-                    if ($leaders->isNotEmpty()) {
-                        $bucket['leader'] = $leaders->shift();
-                        $assigned = true;
+            // Fáze MATCH: Pokusíme se přiřadit kandidáty k bucketům, kde mají děti z vlastní výpravy
+            $remainingCandidates = [];
+            foreach ($candidatesToDraft as $origId) {
+                if (empty($emptyBucketIndices)) break;
+                
+                $matched = false;
+                foreach ($emptyBucketIndices as $idx => $bucketName) {
+                    if (in_array($origId, $buckets[$bucketName]['original_groups_inside'])) {
+                        // Našli jsme bucket s dětmi z této původní skupiny
+                        $buckets[$bucketName]['leader'] = $allLeaders[$origId]->shift();
                         $assignedCount++;
+                        $matched = true;
+                        unset($emptyBucketIndices[$idx]); // Kbelík je plný
                         break;
                     }
                 }
+                // Pokud nikoho svého nenašel, musíme ho přiřadit naslepo v další fázi tohoto kola
+                if (!$matched) {
+                    $remainingCandidates[] = $origId;
+                }
             }
+            
+            // Fáze FALLBACK: Nepřiřazené kandidáty z této rundy nacpeme do zbývajících volných bucketů
+            foreach ($remainingCandidates as $origId) {
+                if (empty($emptyBucketIndices)) break;
+                
+                $idx = array_key_first($emptyBucketIndices);
+                $bucketName = $emptyBucketIndices[$idx];
+                
+                $buckets[$bucketName]['leader'] = $allLeaders[$origId]->shift();
+                $assignedCount++;
+                unset($emptyBucketIndices[$idx]);
+            }
+            
+            $round++;
         }
 
-        // Spočíteme kolik jich zbylo (Off-duty)
+        $offDutyCount = 0;
         foreach ($allLeaders as $leaders) {
             $offDutyCount += $leaders->count();
         }

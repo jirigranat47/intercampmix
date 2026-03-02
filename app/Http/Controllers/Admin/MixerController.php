@@ -18,8 +18,11 @@ class MixerController extends Controller
         // 1. Zjistit jaké subcampy vůbec máme z nahraného Excelu
         $subcamps = OriginalGroup::select('subcamp')->distinct()->pluck('subcamp')->toArray();
 
-        // 2. Clear old target groups (bezpečnostní smazání předřazenosti)
-        Participant::query()->update(['target_group' => null]);
+        // 2. Clear old target groups (bezpečnostní smazání předřazenosti) a resetovat registrační klíče aby nedošlo ke kolizi
+        Participant::query()->update([
+            'target_group' => null,
+            'registration_code' => \Illuminate\Support\Facades\DB::raw("CONCAT('TEMP_', id, '_', md5(random()::text))")
+        ]);
 
         $results = [];
         $totalFallbacks = 0;
