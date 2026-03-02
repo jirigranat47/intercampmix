@@ -33,11 +33,20 @@ class MixerService
         $interleavedBundles = $this->interleaveRoundRobin($bundles);
 
         // KROK D: Plnění Cílových Skupin (Placement) ----------------------------
-        $stats = $this->assignToTargetGroups($interleavedBundles);
+        $assignment = $this->assignToTargetGroups($interleavedBundles);
+        $buckets = $assignment['buckets'];
+        $stats = $assignment['stats'];
+
+        // KROK E: Přiřazení vedoucích --------------------------------------------
+        $leaderStats = $this->assignLeaders($buckets);
+        $stats = array_merge($stats, $leaderStats);
+
+        // KROK F: Finální zápis do DB --------------------------------------------
+        $this->saveToDatabase($buckets);
 
         return [
             'status' => 'success',
-            'message' => "Subcamp {$this->subcampId} rozřazen.",
+            'message' => "Subcamp {$this->subcampId} rozřazen včetně vedoucích.",
             'stats' => $stats
         ];
     }
@@ -51,26 +60,23 @@ class MixerService
         $allBundles = [];
 
         foreach ($groups as $group) {
-            $participants = Participant::where('original_group_id', $group->order_number)->get()->all();
+            // Jen děti, vedoucí se řeší sepárátně v Kroku E
+            $participants = Participant::where('original_group_id', $group->order_number)
+                ->where('is_leader', false)
+                ->get()
+                ->all();
+
             $total = count($participants);
 
             if ($total === 0) continue;
 
-            // Logika rozkládání podle specifikace
-            // Pokud N je liché -> jeden balíček o 3 lidech, zbytek po 2
-            // Pokud N je sudé -> všechny balíčky po 2
-            // Pokud N <= 3 -> celý zbytek je 1 balíček
-            
             $offset = 0;
-            
             if ($total % 2 !== 0 && $total >= 3) {
-                // Liché
                 $bundleKids = array_slice($participants, $offset, 3);
                 $allBundles[] = new ParticipantBundle($bundleKids);
                 $offset += 3;
             }
 
-            // Zbytek padne do dvojic (popř. samostatná jednička pokud N=1)
             while ($offset < $total) {
                 $take = min(2, $total - $offset);
                 $bundleKids = array_slice($participants, $offset, $take);
@@ -89,28 +95,22 @@ class MixerService
      */
     private function interleaveRoundRobin(array $bundles): array
     {
-        // Seskupení do "front" podle Země
         $queuesByCountry = [];
         foreach ($bundles as $bundle) {
             $queuesByCountry[$bundle->country][] = $bundle;
         }
 
-        // Můžeme seřadit země podle velikosti fronty sestupně pro optimální prokládání
         uasort($queuesByCountry, function($a, $b) {
-            return count($b) <=> count($a); // descending
+            return count($b) <=> count($a);
         });
 
         $interleaved = [];
-        
-        // Round robin tahání
         $hasItemsRemaining = true;
         while ($hasItemsRemaining) {
             $hasItemsRemaining = false;
-            
             foreach ($queuesByCountry as $country => &$queue) {
                 if (count($queue) > 0) {
                     $hasItemsRemaining = true;
-                    // Vytáhneme vrchní prvek z fronty
                     $interleaved[] = array_shift($queue);
                 }
             }
@@ -121,48 +121,43 @@ class MixerService
 
     /**
      * KROK D
-     * Rozdělí lidi např. do 90 kbelíků podle toho kolik lidí je celkem
-     * @param ParticipantBundle[] $interleavedBundles
      */
     private function assignToTargetGroups(array $interleavedBundles): array
     {
-        // Spočítáme si celkový počet lidí abychom zjistili, kolik kbelíků (groups) skutečně založit pro tento subcamp.
         $totalKids = 0;
         foreach ($interleavedBundles as $bundle) {
             $totalKids += $bundle->getSize();
         }
 
         $bucketCount = (int) ceil($totalKids / 8.0);
-        if ($bucketCount === 0) return [];
+        if ($bucketCount === 0) return ['buckets' => [], 'stats' => []];
 
-        // Inicializujeme kbelíky ("A1".. "Z9" atd.)
-        // Zjednodušené indexování SCX_G1, SCX_G2...
         $buckets = [];
         for ($i = 1; $i <= $bucketCount; $i++) {
             $bucketName = "SC" . $this->subcampId . "_G" . str_pad($i, 2, '0', STR_PAD_LEFT);
             $buckets[$bucketName] = [
                 'name' => $bucketName,
                 'size' => 0,
-                'original_groups_inside' => [], // tracking for Priority group constraint
-                'countries_inside' => [],       // tracking for Nationality diversity
-                'bundles' => []
+                'original_groups_inside' => [],
+                'countries_inside' => [],
+                'bundles' => [],
+                'leader' => null
             ];
         }
 
         $stats = [
             'total_children' => $totalKids,
             'groups_created' => $bucketCount,
-            'tier1' => 0, // Ideal: No OG, No Country
-            'tier2' => 0, // Good: No OG
-            'tier3' => 0, // Fallback: Space only
-            'tier4' => 0  // Overfill: No space anywhere
+            'tier1' => 0,
+            'tier2' => 0,
+            'tier3' => 0,
+            'tier4' => 0
         ];
 
         foreach ($interleavedBundles as $bundle) {
             $placedBucketName = null;
             $bundleSize = $bundle->getSize();
 
-            // TIER 1: Najlepší kbelík (má místo A ZÁROVEŇ v něm není původní skupina A ZÁROVEŇ v něm není stejná národnost)
             $tier1Buckets = [];
             foreach ($buckets as $name => $bucket) {
                 if ($bucket['size'] + $bundleSize <= 8) {
@@ -175,12 +170,10 @@ class MixerService
             }
 
             if (!empty($tier1Buckets)) {
-                // Z Tier 1 najít nejprázdnější
                 uasort($tier1Buckets, function($a, $b) { return $a['size'] <=> $b['size']; });
                 $placedBucketName = array_key_first($tier1Buckets);
                 $stats['tier1']++;
             } else {
-                // TIER 2: Dobrý kbelík (má místo A ZÁROVEŇ v něm není původní skupina, ale národnost už tam může být)
                 $tier2Buckets = [];
                 foreach ($buckets as $name => $bucket) {
                     if ($bucket['size'] + $bundleSize <= 8) {
@@ -195,7 +188,6 @@ class MixerService
                     $placedBucketName = array_key_first($tier2Buckets);
                     $stats['tier2']++;
                 } else {
-                    // TIER 3: Má místo (ale porušuje OG nebo národnost)
                     $tier3Buckets = [];
                     foreach ($buckets as $name => $bucket) {
                         if ($bucket['size'] + $bundleSize <= 8) {
@@ -208,7 +200,6 @@ class MixerService
                         $placedBucketName = array_key_first($tier3Buckets);
                         $stats['tier3']++;
                     } else {
-                        // TIER 4: ÚPLNÝ FALLBACK (přetečení přes 10)
                         $stats['tier4']++;
                         uasort($buckets, function($a, $b) { return $a['size'] <=> $b['size']; });
                         $placedBucketName = array_key_first($buckets);
@@ -216,15 +207,75 @@ class MixerService
                 }
             }
 
-            // Samotné vložení do kbelíku
             $buckets[$placedBucketName]['size'] += $bundleSize;
             $buckets[$placedBucketName]['original_groups_inside'][] = $bundle->originalGroupId;
             $buckets[$placedBucketName]['countries_inside'][] = $bundle->country;
             $buckets[$placedBucketName]['bundles'][] = $bundle;
         }
 
-        // FINÁLNÍ ZÁPIS DO DB
+        return ['buckets' => $buckets, 'stats' => $stats];
+    }
+
+    /**
+     * KROK E: Přiřazení vedoucích
+     */
+    private function assignLeaders(array &$buckets): array
+    {
+        // Najdeme všechny vedoucí v tomto subcampu
+        $allLeaders = Participant::where('is_leader', true)
+            ->whereIn('original_group_id', function($query) {
+                $query->select('order_number')->from('original_groups')->where('subcamp', $this->subcampId);
+            })
+            ->get()
+            ->groupBy('original_group_id');
+
+        $assignedCount = 0;
+        $offDutyCount = 0;
+
+        foreach ($buckets as &$bucket) {
+            $assigned = false;
+            
+            // Priorita: Vedoucí z výpravy, která je v kbelíku
+            foreach ($bucket['original_groups_inside'] as $origId) {
+                if (isset($allLeaders[$origId]) && $allLeaders[$origId]->isNotEmpty()) {
+                    $bucket['leader'] = $allLeaders[$origId]->shift();
+                    $assigned = true;
+                    $assignedCount++;
+                    break;
+                }
+            }
+
+            // Fallback: Pokud nikdo z "vlastních" už není, vezmeme kohokoliv volného
+            if (!$assigned) {
+                foreach ($allLeaders as $origId => $leaders) {
+                    if ($leaders->isNotEmpty()) {
+                        $bucket['leader'] = $leaders->shift();
+                        $assigned = true;
+                        $assignedCount++;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Spočíteme kolik jich zbylo (Off-duty)
+        foreach ($allLeaders as $leaders) {
+            $offDutyCount += $leaders->count();
+        }
+
+        return [
+            'leaders_assigned' => $assignedCount,
+            'leaders_off_duty' => $offDutyCount
+        ];
+    }
+
+    /**
+     * KROK F: Zápis do DB
+     */
+    private function saveToDatabase(array $buckets): void
+    {
         foreach ($buckets as $bucket) {
+            // Uložení dětí
             $ordinal = 1;
             foreach ($bucket['bundles'] as $bundle) {
                 foreach ($bundle->participants as $participant) {
@@ -234,8 +285,17 @@ class MixerService
                     $ordinal++;
                 }
             }
-        }
 
-        return $stats;
+            // Uložení vedoucího
+            if ($bucket['leader']) {
+                $leader = $bucket['leader'];
+                $leader->target_group = $bucket['name'];
+                $leader->registration_code = $bucket['name'] . "_X";
+                $leader->save();
+            }
+        }
+        
+        // Důležité: Vedoucí, kteří nebyli přiřazeni, by měli mít smazané staré rozřazení
+        // (V reálu se tabulka truncateuje při importu, ale pro jistotu)
     }
 }

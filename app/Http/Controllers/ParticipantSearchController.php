@@ -27,7 +27,7 @@ class ParticipantSearchController extends Controller
         $code = strtoupper(trim($request->input('code')));
         
         // Hledáme účastníka podle kódu
-        $participant = Participant::where('registration_code', $code)->first();
+        $participant = Participant::with('originalGroup')->where('registration_code', $code)->first();
 
         if (!$participant) {
             return back()->with('error', 'Kód nebyl nalezen. Zkontrolujte prosím zadání.');

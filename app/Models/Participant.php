@@ -13,6 +13,7 @@ class Participant extends Model
         'registration_code',
         'first_name',
         'last_name',
+        'is_leader',
         'country',
         'original_group_id',
         'target_group'

@@ -29,15 +29,18 @@ class ImportController extends Controller
             $worksheet = $spreadsheet->getActiveSheet();
             $rows = $worksheet->toArray();
             
-            // Check headers on row 0
-            if (count($rows) < 2) {
-                return back()->withErrors('Soubor je prázdný nebo nemá dostatek dat.');
-            }
+            // Expected cols names:
+            // Country, Troop name, Number of Children, Order Number, Subcamp, Number of Leaders
+            $header = array_map('trim', $rows[0]);
             
-            // Expected cols from index 0:
-            // 6 => Country, 8 => Troop name, 11 => Number of Children, 18 => Order Number, 25 => Subcamp
-            $header = $rows[0];
-            if (trim($header[6]) !== 'Country' || trim($header[11]) !== 'Number of Children' || trim($header[25]) !== 'Subcamp') {
+            $colCountry = array_search('Country', $header);
+            $colChildren = array_search('Number of Children', $header);
+            $colSubcamp = array_search('Subcamp', $header);
+            $colOrderNum = array_search('Order Number', $header);
+            $colTroop = array_search('Troop name', $header);
+            $colLeaders = array_search('Number of Leaders', $header);
+
+            if ($colCountry === false || $colChildren === false || $colSubcamp === false) {
                 return back()->withErrors('Soubor nemá očekávanou strukturu sloupců (chybí Country, Number of Children nebo Subcamp).');
             }
 
@@ -46,6 +49,7 @@ class ImportController extends Controller
             OriginalGroup::truncate();
 
             $totalChildrenImported = 0;
+            $totalLeadersImported = 0;
             $groupsProcessed = 0;
 
             // Procesování řádků (od indexu 1, ignorujeme hlavičku)
@@ -53,25 +57,24 @@ class ImportController extends Controller
                 $row = $rows[$i];
                 
                 // Přeskočíme prázdné řádky na konci Excelu
-                if (empty(trim($row[18])) && empty(trim($row[6]))) {
+                if (empty(trim($row[$colOrderNum] ?? '')) && empty(trim($row[$colCountry] ?? ''))) {
                     continue; 
                 }
 
-                $orderNumber = trim($row[18] ?? '');
-                $country = trim($row[6] ?? 'Unknown');
-                $troopName = trim($row[8] ?? '');
-                $numChildren = (int)($row[11] ?? 0);
+                $orderNumber = trim($row[$colOrderNum] ?? '');
+                $country = trim($row[$colCountry] ?? 'Unknown');
+                $troopName = trim($row[$colTroop] ?? '');
+                $numChildren = (int)($row[$colChildren] ?? 0);
+                $numLeaders = ($colLeaders !== false) ? (int)($row[$colLeaders] ?? 0) : 0;
                 
-                // Převod sloupce 25 (Subcamp) na integer
-                $rawSubcamp = trim($row[25] ?? '');
+                $rawSubcamp = trim($row[$colSubcamp] ?? '');
                 $subcamp = 1;
-                // Pokud z tabulky přijde rovnou číslo, nebo text jako "Subcamp 2"
                 if (preg_match('/(\d+)/', $rawSubcamp, $matches)) {
                     $subcamp = (int)$matches[1];
                 }
 
-                if ($numChildren <= 0) {
-                    continue; // Skip if no children to mix
+                if ($numChildren <= 0 && $numLeaders <= 0) {
+                    continue; // Skip if nothing in the group
                 }
 
                 $group = OriginalGroup::firstOrCreate(
@@ -80,37 +83,53 @@ class ImportController extends Controller
                         'country' => $country,
                         'subcamp' => $subcamp,
                         'troop_name' => $troopName,
-                        'number_of_children' => 0 // we will increment below
+                        'number_of_children' => 0,
+                        'number_of_leaders' => 0
                     ]
                 );
                 
-                // Pokud se jednalo o existující, musíme zaručit že má správný subcamp (např. oprava po předchozím loopu s default=1)
                 if ($group->subcamp === 1 && $subcamp !== 1) {
                     $group->subcamp = $subcamp;
                 }
                 
-                // Add the children count from this row to the group
                 $group->number_of_children += $numChildren;
+                $group->number_of_leaders += $numLeaders;
                 $group->save();
 
-                // Create individual participants for algorithmic sorting
-                $existingKidsCount = Participant::where('original_group_id', $group->order_number)->count();
+                // Create children
+                $existingKidsCount = Participant::where('original_group_id', $group->order_number)->where('is_leader', false)->count();
                 for ($p = 1; $p <= $numChildren; $p++) {
                     $kidIndex = $existingKidsCount + $p;
                     Participant::create([
-                        'registration_code' => Str::random(8) . '-' . $kidIndex,
+                        'registration_code' => 'TEMP_CHILD_' . Str::random(5), // Will be replaced by Mixer
                         'first_name' => 'Kid #' . $kidIndex,
                         'last_name' => "($troopName)",
+                        'is_leader' => false,
                         'country' => $country,
                         'original_group_id' => $group->order_number,
                     ]);
                     $totalChildrenImported++;
                 }
 
+                // Create leaders
+                $existingLeadersCount = Participant::where('original_group_id', $group->order_number)->where('is_leader', true)->count();
+                for ($l = 1; $l <= $numLeaders; $l++) {
+                    $leaderIndex = $existingLeadersCount + $l;
+                    Participant::create([
+                        'registration_code' => 'TEMP_LEADER_' . Str::random(5), // Will be replaced by Mixer
+                        'first_name' => 'Leader #' . $leaderIndex,
+                        'last_name' => "($troopName)",
+                        'is_leader' => true,
+                        'country' => $country,
+                        'original_group_id' => $group->order_number,
+                    ]);
+                    $totalLeadersImported++;
+                }
+
                 $groupsProcessed++;
             }
 
-            return back()->with('success', "Import byl úspěšný! Načteno {$groupsProcessed} skupin s {$totalChildrenImported} dětmi.");
+            return back()->with('success', "Import byl úspěšný! Načteno {$groupsProcessed} skupin s {$totalChildrenImported} dětmi a {$totalLeadersImported} vedoucími.");
 
         } catch (\Exception $e) {
             return back()->withErrors('Nastala chyba při čtení souboru: ' . $e->getMessage());

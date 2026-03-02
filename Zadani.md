@@ -5,11 +5,11 @@ Cílem aplikace je spravedlivé a strategické rozdělení účastníků do cíl
 
 ## 2. Klíčové funkce
 ### Administrační modul (Admin)
-* **Import dat:** Nahrání souboru `.xlsx` se seznamem dětí. Vstupní sobor pro testování a vývoj 20250524_Groups per SC_Intercamp_V5.xlsx a data jsou na záložce All Subcamps.
+* **Import dat:** Nahrání souboru `.xlsx` se seznamem dětí a vedoucích (sloupec "Number of Children" a "Number of Leaders"). Vstupní sobor pro testování a vývoj 20250524_Groups per SC_Intercamp_V5.xlsx a data jsou na záložce All Subcamps.
 * **Validace:** * Žádná vstupní skupina nesmí mít více než 20 dětí (jinak error).
-    * Celkový počet dětí musí být přesně 900.
-* **Zpracování:** Spuštění deterministického míchacího algoritmu (viz níže).
-* **Export:** Stažení výsledného mapování ve formátu `.csv`.
+    * Celkový počet dětí musí odpovídat počtu skupin (v poměru k 8 dětem na skupinu).
+* **Zpracování:** Spuštění míchacího algoritmu pro děti a následné přiřazení vedoucích.
+* **Export:** Stažení výsledného mapování dětí i vedoucích v `.csv`.
 * **Persistence:** Uložení výsledků do PostgreSQL (přepisuje předchozí běh).
 
 ### Uživatelský modul (Veřejný)
@@ -39,6 +39,14 @@ Algoritmus prochází proložený seznam balíčků a umisťuje je do cílových
 1.  **Priorita plnění:** Balíček se přednostně dává do skupiny, která má aktuálně nejméně dětí.
 2.  **Kontrola duplicity původu:** Do jedné cílové skupiny nesmí být umístěny dva balíčky, které pocházejí ze **stejné původní vstupní skupiny** (i kdyby to byla stejná země).
 3.  **Fallback:** Pokud by pravidlo č. 2 znemožnilo dokončení algoritmu (v závěrečné fázi), pravidlo se uvolní a balíček se umístí do první volné skupiny s kapacitou.
+
+### Krok E: Přiřazení vedoucích
+Po rozmíchání všech dětí do cílových skupin se provede přiřazení vedoucích:
+1.  **Cíl:** Každá cílová skupina (`SCx_Gxx`) musí mít právě jednoho vedoucího.
+2.  **Párování:** Vedoucí je prioritně přidělen do skupiny, kde se nachází alespoň jeden balíček z jeho vlastní původní výpravy (`OriginalGroup`).
+3.  **Záloha (Off-duty):** Pokud má výprava více než jednoho vedoucího, alespoň jeden z nich může zůstat "mimo rozřazení" (nebude mu přidělena skupina), pokud je celkový počet vedoucích v subcampu dostatečný pro pokrytí všech skupin.
+4.  **Kód vedoucího:** Vedoucí dostane kód ve formátu `SCx_Gxx_X` (např. `SC1_G01_X`).
+5.  **Vyhledávání:** Veřejné vyhledávání musí podle kódu `_X` správně identifikovat subcamp a skupinu vedoucího.
 
 ## 4. Technologický stack
 * **Jazyk:** PHP 8.3 (Framework Laravel)

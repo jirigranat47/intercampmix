@@ -43,6 +43,15 @@
                                 {{ $participant->originalGroup->troop_name ?? 'Neznámý tým' }}
                             </h2>
                         </div>
+                        <div class="mb-8">
+                            <span class="block text-xs text-gray-400 uppercase tracking-widest mb-1">
+                                @if($participant->is_leader)
+                                    <span class="text-blue-600 font-black">LEADER / VEDOUCÍ</span>
+                                @else
+                                    Účastník
+                                @endif
+                            </span>                            
+                        </div>
                         
                         <div class="mb-8">
                             <span class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-1 block">Nationality / Národnost</span>

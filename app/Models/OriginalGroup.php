@@ -14,6 +14,7 @@ class OriginalGroup extends Model
         'country',
         'subcamp',
         'troop_name',
-        'number_of_children'
+        'number_of_children',
+        'number_of_leaders'
     ];
 }
