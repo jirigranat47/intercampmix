@@ -1,32 +1,32 @@
 @extends('layout')
 
-@section('title', 'Prohlížeč Databáze')
+@section('title', __('Prohlížeč Databáze'))
 
 @section('content')
 <div class="mb-8">
-    <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">Obsah Databáze</h2>
+    <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">{{ __('Obsah databáze') }}</h2>
     <p class="mt-1 text-sm text-gray-500">
-        Zde si můžete prohlédnout tabulky s nahranými daty a jak algoritmus přiřadil cílové skupiny.
+        {{ __('Zde si můžete prohlédnout tabulky s nahranými daty a jak algoritmus přiřadil cílové skupiny.') }}
     </p>
 </div>
 
 <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-8 p-4">
     <form action="{{ route('admin.db') }}" method="GET" class="flex items-center space-x-4">
         <div>
-            <label for="subcamp" class="block text-sm font-medium text-gray-700">Filtr Subcamp</label>
+            <label for="subcamp" class="block text-sm font-medium text-gray-700">{{ __('Filtr Subcamp') }}</label>
             <select id="subcamp" name="subcamp" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                <option value="">Všechny Subcampy</option>
+                <option value="">{{ __('Všechny Subcampy') }}</option>
                 @foreach($allSubcamps as $sc)
-                    <option value="{{ $sc }}" {{ $selectedSubcamp == $sc ? 'selected' : '' }}>Subcamp {{ $sc }}</option>
+                    <option value="{{ $sc }}" {{ $selectedSubcamp == $sc ? 'selected' : '' }}>{{ __('Subcamp') }} {{ $sc }}</option>
                 @endforeach
             </select>
         </div>
         <div class="pt-5">
             <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                Filtrovat
+                {{ __('Filtrovat') }}
             </button>
             @if($selectedSubcamp)
-                <a href="{{ route('admin.db') }}" class="ml-2 text-sm text-gray-500 hover:text-gray-700 underline">Zrušit filtr</a>
+                <a href="{{ route('admin.db') }}" class="ml-2 text-sm text-gray-500 hover:text-gray-700 underline">{{ __('Zrušit filtr') }}</a>
             @endif
         </div>
     </form>
@@ -36,10 +36,10 @@
     <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
         <div>
             <h3 class="text-lg leading-6 font-medium text-gray-900">
-                Tabulka: Original Groups (Skupiny z Excelu)
+                {{ __('Tabulka: Original Groups (Skupiny z Excelu)') }}
             </h3>
             <p class="mt-1 max-w-2xl text-sm text-gray-500">
-                Celkem záznamů v pohledu: {{ count($groups) }}
+                {{ __('Celkem záznamů v pohledu:') }} {{ count($groups) }}
             </p>
         </div>
     </div>
@@ -48,12 +48,12 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subcamp</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order Number</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Country</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Troop Name</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-center">Děti</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-center">Vedoucí</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Subcamp') }}</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Order Number') }}</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Country') }}</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Troop Name') }}</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-center">{{ __('Děti') }}</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-center">{{ __('Vedoucí') }}</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -76,10 +76,10 @@
 <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
     <div class="px-4 py-5 sm:px-6">
         <h3 class="text-lg leading-6 font-medium text-gray-900">
-            Tabulka: Vygenerované Cílové Skupiny (Target Groups)
+            {{ __('Tabulka: Vygenerované Cílové Skupiny (Target Groups)') }}
         </h3>
         <p class="mt-1 max-w-2xl text-sm text-gray-500">
-            Zobrazeno {{ $targetGroups->count() }} celkových skupin.
+            {{ __('Zobrazeno') }} {{ $targetGroups->count() }} {{ __('celkových skupin.') }}
         </p>
     </div>
 
@@ -100,7 +100,7 @@
                     <div class="px-4 py-3 border-b border-gray-200 bg-gray-100 flex justify-between items-center">
                         <h4 class="text-md font-bold text-indigo-700">{{ $groupName }}</h4>
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                            {{ $leaderCount }} + {{ $kidCount }} Členů
+                            {{ $leaderCount }} + {{ $kidCount }} {{ __('Členů') }}
                         </span>
                     </div>
                     <div class="px-4 py-3">
@@ -113,7 +113,7 @@
                                                 {{ $p->first_name }} {{ $p->last_name }} 
                                             </p>
                                             @if($p->is_leader)
-                                                <span class="px-2 inline-flex text-[10px] leading-4 font-semibold rounded-sm bg-blue-100 text-blue-800">Vedoucí</span>
+                                                <span class="px-2 inline-flex text-[10px] leading-4 font-semibold rounded-sm bg-blue-100 text-blue-800">{{ __('Vedoucí') }}</span>
                                             @endif
                                         </div>
                                         <div class="flex justify-between mt-1 text-xs text-gray-500">
@@ -124,7 +124,7 @@
                                 </li>
                             @endforeach
                             @if($members->isEmpty())
-                                <p class="text-xs text-gray-500 text-center py-2">Žádní účastníci</p>
+                                <p class="text-xs text-gray-500 text-center py-2">{{ __('Žádní účastníci') }}</p>
                             @endif
                         </ul>
                     </div>
@@ -134,7 +134,7 @@
 
         @if($targetGroups->isEmpty())
             <div class="text-center py-8 text-gray-500">
-                Nebyly nalezeny žádné cílové skupiny. Zkuste spustit rozřazovací algoritmus.
+                {{ __('Nebyly nalezeny žádné cílové skupiny. Zkuste spustit rozřazovací algoritmus.') }}
             </div>
         @endif
     </div>

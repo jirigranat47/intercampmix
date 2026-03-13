@@ -41,7 +41,7 @@ class ImportController extends Controller
             $colLeaders = array_search('Number of Leaders', $header);
 
             if ($colCountry === false || $colChildren === false || $colSubcamp === false) {
-                return back()->withErrors('Soubor nemá očekávanou strukturu sloupců (chybí Country, Number of Children nebo Subcamp).');
+                return back()->withErrors(__('Soubor nemá očekávanou strukturu sloupců (chybí Country, Number of Children nebo Subcamp).'));
             }
 
             // Vyčistíme stará data před novým importem
@@ -67,6 +67,12 @@ class ImportController extends Controller
                 $numChildren = (int)($row[$colChildren] ?? 0);
                 $numLeaders = ($colLeaders !== false) ? (int)($row[$colLeaders] ?? 0) : 0;
                 
+                // Read leader info from columns B, C, E (indices 1, 2, 4)
+                $leaderFirstName = trim($row[1] ?? '');
+                $leaderLastName = trim($row[2] ?? '');
+                $leaderName = trim($leaderFirstName . ' ' . $leaderLastName);
+                $leaderPhone = trim($row[4] ?? '');
+
                 $rawSubcamp = trim($row[$colSubcamp] ?? '');
                 $subcamp = 1;
                 if (preg_match('/(\d+)/', $rawSubcamp, $matches)) {
@@ -95,7 +101,9 @@ class ImportController extends Controller
                         'subcamp' => $subcamp,
                         'troop_name' => $troopName,
                         'number_of_children' => 0,
-                        'number_of_leaders' => 0
+                        'number_of_leaders' => 0,
+                        'leader_name' => $leaderName,
+                        'leader_phone' => $leaderPhone
                     ]
                 );
                 
@@ -107,6 +115,14 @@ class ImportController extends Controller
                     $group->country = $country;
                 }
                 
+                // Update leader info if it was missing in previous rows for the same order number
+                if (empty($group->leader_name) && !empty($leaderName)) {
+                    $group->leader_name = $leaderName;
+                }
+                if (empty($group->leader_phone) && !empty($leaderPhone)) {
+                    $group->leader_phone = $leaderPhone;
+                }
+
                 $group->number_of_children += $numChildren;
                 $group->number_of_leaders += $numLeaders;
                 $group->save();
@@ -144,10 +160,14 @@ class ImportController extends Controller
                 $groupsProcessed++;
             }
 
-            return back()->with('success', "Import byl úspěšný! Načteno {$groupsProcessed} skupin s {$totalChildrenImported} dětmi a {$totalLeadersImported} vedoucími.");
+            return back()->with('success', __('Import byl úspěšný! Načteno :groups skupin s :children dětmi a :leaders vedoucími.', [
+                'groups' => $groupsProcessed,
+                'children' => $totalChildrenImported,
+                'leaders' => $totalLeadersImported
+            ]));
 
         } catch (\Exception $e) {
-            return back()->withErrors('Nastala chyba při čtení souboru: ' . $e->getMessage());
+            return back()->withErrors(__('Nastala chyba při čtení souboru:') . ' ' . $e->getMessage());
         }
     }
 }

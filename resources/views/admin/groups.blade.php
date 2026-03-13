@@ -1,18 +1,18 @@
 @extends('layout')
 
-@section('title', 'Přehled vytvořených skupin')
+@section('title', __('Přehled vytvořených skupin'))
 
 @section('content')
 <div class="mb-8 flex justify-between items-center">
     <div>
-        <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">Přehled vytvořených skupin</h2>
+        <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">{{ __('Přehled vytvořených skupin') }}</h2>
         <p class="mt-1 text-sm text-gray-500">
-            Detailní rozpis všech cílových skupin, jejich složení a vedoucích.
+            {{ __('Detailní rozpis všech cílových skupin, jejich složení a vedoucích.') }}
         </p>
     </div>
     <div>
         <a href="{{ route('admin.db') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-            Zpět na databázi
+            {{ __('Zpět na databázi') }}
         </a>
     </div>
 </div>
@@ -20,20 +20,20 @@
 <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-8 p-4">
     <form action="{{ route('admin.groups') }}" method="GET" class="flex items-center space-x-4">
         <div>
-            <label for="subcamp" class="block text-sm font-medium text-gray-700">Filtr Subcamp</label>
+            <label for="subcamp" class="block text-sm font-medium text-gray-700">{{ __('Filtr Subcamp') }}</label>
             <select id="subcamp" name="subcamp" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                <option value="">Všechny Subcampy</option>
+                <option value="">{{ __('Všechny Subcampy') }}</option>
                 @foreach($allSubcamps as $sc)
-                    <option value="{{ $sc }}" {{ $selectedSubcamp == $sc ? 'selected' : '' }}>Subcamp {{ $sc }}</option>
+                    <option value="{{ $sc }}" {{ $selectedSubcamp == $sc ? 'selected' : '' }}>{{ __('Subcamp') }} {{ $sc }}</option>
                 @endforeach
             </select>
         </div>
         <div class="pt-5">
             <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                Filtrovat
+                {{ __('Filtrovat') }}
             </button>
             @if($selectedSubcamp)
-                <a href="{{ route('admin.groups') }}" class="ml-2 text-sm text-gray-500 hover:text-gray-700 underline">Zrušit filtr</a>
+                <a href="{{ route('admin.groups') }}" class="ml-2 text-sm text-gray-500 hover:text-gray-700 underline">{{ __('Zrušit filtr') }}</a>
             @endif
         </div>
     </form>
@@ -45,7 +45,7 @@
             <div class="px-4 py-5 sm:px-6 flex justify-between items-center bg-gray-50">
                 <div>
                     <h3 class="text-lg leading-6 font-bold text-gray-900">
-                        Skupina #{{ $id }} <span class="ml-2 text-sm font-normal text-gray-500">(Subcamp {{ $group['subcamp'] }})</span>
+                        {{ __('Skupina') }} #{{ $id }} <span class="ml-2 text-sm font-normal text-gray-500">({{ __('Subcamp') }} {{ $group['subcamp'] }})</span>
                     </h3>
                 </div>
                 <div class="flex space-x-2">
@@ -59,7 +59,7 @@
             <div class="border-t border-gray-200 px-4 py-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <h4 class="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wider">Vedoucí</h4>
+                        <h4 class="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wider">{{ __('Vedoucí') }}</h4>
                         <div class="space-y-1">
                             @forelse($group['leaders'] as $leader)
                                 <div class="flex items-center text-sm text-gray-900 bg-green-50 p-2 rounded border border-green-100">
@@ -71,12 +71,12 @@
                                     <span class="ml-auto text-xs font-bold text-green-700 uppercase tracking-tighter">{{ $leader->country }}</span>
                                 </div>
                             @empty
-                                <p class="text-sm text-red-500 italic">Bez přiřazeného vedoucího!</p>
+                                <p class="text-sm text-red-500 italic">{{ __('Bez přiřazeného vedoucího!') }}</p>
                             @endforelse
                         </div>
                     </div>
                     <div>
-                        <h4 class="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wider">Kódy účastníků ({{ $group['member_count'] }})</h4>
+                        <h4 class="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wider">{{ __('Kódy účastníků') }} ({{ $group['member_count'] }})</h4>
                         <div class="flex flex-wrap gap-1">
                             @foreach($group['codes'] as $code)
                                 <span class="inline-flex items-center px-2 py-1 rounded text-xs font-mono bg-gray-100 text-gray-800 border border-gray-200">
@@ -93,11 +93,12 @@
             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
             </svg>
-            <h3 class="mt-2 text-sm font-medium text-gray-900">Žádné skupiny</h3>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __('Žádné skupiny') }}</h3>
             <p class="mt-1 text-sm text-gray-500">
-                Nebyly nalezeny žádné vytvořené skupiny pro daný filtr.
+                {{ __('Nebyly nalezeny žádné vytvořené skupiny pro daný filtr.') }}
             </p>
         </div>
     @endforelse
 </div>
+@endsection
 @endsection

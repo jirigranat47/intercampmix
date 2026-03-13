@@ -32,13 +32,13 @@ class MixerController extends Controller
             $outcome = $service->mix();
             $stats = $outcome['stats'];
             
-            $results[] = "Subcamp {$scLabel}: {$stats['groups_created']} skupin / {$stats['total_children']} dětí (Ideální: {$stats['tier1']}, Jen skupina: {$stats['tier2']}, Fallback: {$stats['tier3']}, Přeteklo: {$stats['tier4']}).";
+            $results[] = __('Subcamp') . " {$scLabel}: {$stats['groups_created']} " . __('skupin') . " / {$stats['total_children']} " . __('dětí') . " (" . __('Ideální') . ": {$stats['tier1']}, " . __('Jen skupina') . ": {$stats['tier2']}, " . __('Fallback') . ": {$stats['tier3']}, " . __('Přeteklo') . ": {$stats['tier4']}).";
             $totalFallbacks += ($stats['tier3'] + $stats['tier4']);
         }
 
-        $msg = "Úspěšně rozřazeno! " . implode(" ", $results);
+        $msg = __('Úspěšně rozřazeno!') . " " . implode(" ", $results);
         if ($totalFallbacks > 0) {
-            $msg .= " (Upozornění: Pravidlo o unikátnosti původní skupiny nebo národnosti muselo být $totalFallbacks krát na konci prolomeno [Fallback]).";
+            $msg .= " " . __('(Upozornění: Pravidlo o unikátnosti původní skupiny nebo národnosti muselo být :total krát na konci prolomeno [Fallback]).', ['total' => $totalFallbacks]);
         }
 
         return back()->with('success', $msg);
@@ -52,7 +52,7 @@ class MixerController extends Controller
         $participants = Participant::orderBy('target_group')->get();
 
         if ($participants->isEmpty()) {
-            return back()->withErrors('Nejsou k dispozici žádná data k exportu.');
+            return back()->withErrors(__('Nejsou k dispozici žádná data k exportu.'));
         }
 
         $headers = [

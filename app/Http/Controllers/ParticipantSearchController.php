@@ -30,7 +30,7 @@ class ParticipantSearchController extends Controller
         $participant = Participant::with('originalGroup')->where('registration_code', $code)->first();
 
         if (!$participant) {
-            return back()->with('error', 'Kód nebyl nalezen. Zkontrolujte prosím zadání.');
+            return back()->with('error', __('Kód nebyl nalezen. Zkontrolujte prosím zadání.'));
         }
 
         return view('search', [

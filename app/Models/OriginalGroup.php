@@ -15,6 +15,8 @@ class OriginalGroup extends Model
         'subcamp',
         'troop_name',
         'number_of_children',
-        'number_of_leaders'
+        'number_of_leaders',
+        'leader_name',
+        'leader_phone'
     ];
 }
