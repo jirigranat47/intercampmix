@@ -3,83 +3,110 @@
 @section('title', __('Prohlížeč Databáze'))
 
 @section('content')
-<div class="mb-8">
-    <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">{{ __('Obsah databáze') }}</h2>
-    <p class="mt-1 text-sm text-gray-500">
-        {{ __('Zde si můžete prohlédnout tabulky s nahranými daty a jak algoritmus přiřadil cílové skupiny.') }}
-    </p>
+<div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div>
+        <h2 class="text-2xl font-black text-gray-900 leading-tight">{{ __('Obsah databáze') }}</h2>
+        <p class="text-gray-500">{{ __('Zde si můžete prohlédnout nahraná data a přiřazené skupiny.') }}</p>
+    </div>
 </div>
 
-<div class="bg-white shadow overflow-hidden sm:rounded-lg mb-8 p-4">
-    <form action="{{ route('admin.db') }}" method="GET" class="flex items-center space-x-4">
-        <div>
-            <label for="subcamp" class="block text-sm font-medium text-gray-700">{{ __('Filtr Subcamp') }}</label>
-            <select id="subcamp" name="subcamp" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+<div class="bg-card shadow-xl rounded-3xl mb-8 p-6 border border-theme">
+    <form action="{{ route('admin.db') }}" method="GET" class="flex flex-col sm:flex-row items-end gap-4">
+        <div class="w-full sm:w-auto min-w-[200px]">
+            <label for="subcamp" class="block text-sm font-bold text-gray-700 mb-1">{{ __('Filtr Subcamp') }}</label>
+            <select id="subcamp" name="subcamp" class="w-full px-4 py-2 rounded-xl border-2 border-gray-100 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all bg-white">
                 <option value="">{{ __('Všechny Subcampy') }}</option>
                 @foreach($allSubcamps as $sc)
                     <option value="{{ $sc }}" {{ $selectedSubcamp == $sc ? 'selected' : '' }}>{{ __('Subcamp') }} {{ $sc }}</option>
                 @endforeach
             </select>
         </div>
-        <div class="pt-5">
-            <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                {{ __('Filtrovat') }}
+        <div class="flex items-center space-x-2 w-full sm:w-auto">
+            <button type="submit" class="flex-grow sm:flex-none py-2 px-6 rounded-xl border border-transparent shadow-lg text-sm font-bold text-white bg-blue-700 hover:bg-blue-800 transition-all active:scale-95">
+                🔍 {{ __('Filtrovat') }}
             </button>
             @if($selectedSubcamp)
-                <a href="{{ route('admin.db') }}" class="ml-2 text-sm text-gray-500 hover:text-gray-700 underline">{{ __('Zrušit filtr') }}</a>
+                <a href="{{ route('admin.db') }}" class="text-sm font-medium text-gray-500 hover:text-gray-700 underline">{{ __('Zrušit') }}</a>
             @endif
         </div>
     </form>
 </div>
 
-<div class="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
-    <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+<div class="bg-card shadow-xl rounded-3xl border border-theme overflow-hidden mb-8">
+    <div class="px-6 py-5 flex justify-between items-center bg-gray-50/50 border-b border-gray-100">
         <div>
-            <h3 class="text-lg leading-6 font-medium text-gray-900">
-                {{ __('Tabulka: Original Groups (Skupiny z Excelu)') }}
+            <h3 class="text-lg font-black text-gray-900">
+                {{ __('Skupiny z Excelu (Original Groups)') }}
             </h3>
-            <p class="mt-1 max-w-2xl text-sm text-gray-500">
-                {{ __('Celkem záznamů v pohledu:') }} {{ count($groups) }}
+            <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">
+                {{ __('Celkem záznamů:') }} {{ count($groups) }}
             </p>
         </div>
     </div>
-    <div class="border-t border-gray-200">
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Subcamp') }}</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Order Number') }}</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Country') }}</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Troop Name') }}</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-center">{{ __('Děti') }}</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-center">{{ __('Vedoucí') }}</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    @foreach($groups as $g)
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $g->subcamp }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $g->order_number }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $g->country }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ Str::limit($g->troop_name, 30) }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ $g->number_of_children }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center font-bold">{{ $g->number_of_leaders }}</td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+    
+    <!-- Desktop Table -->
+    <div class="hidden md:block overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50/80">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-black text-gray-500 uppercase tracking-wider">{{ __('Subcamp') }}</th>
+                    <th class="px-6 py-3 text-left text-xs font-black text-gray-500 uppercase tracking-wider">{{ __('Číslo obj.') }}</th>
+                    <th class="px-6 py-3 text-left text-xs font-black text-gray-500 uppercase tracking-wider">{{ __('Země') }}</th>
+                    <th class="px-6 py-3 text-left text-xs font-black text-gray-500 uppercase tracking-wider">{{ __('Název skupiny') }}</th>
+                    <th class="px-6 py-3 text-center text-xs font-black text-gray-500 uppercase tracking-wider">{{ __('Děti') }}</th>
+                    <th class="px-6 py-3 text-center text-xs font-black text-gray-500 uppercase tracking-wider">{{ __('Vedoucí') }}</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                @foreach($groups as $g)
+                <tr class="hover:bg-blue-50/30 transition-colors">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $g->subcamp }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{{ $g->order_number }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $g->country }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-500">{{ Str::limit($g->troop_name, 40) }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ $g->number_of_children }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-700 text-center font-black">{{ $g->number_of_leaders }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Mobile Card View -->
+    <div class="md:hidden divide-y divide-gray-100">
+        @foreach($groups as $g)
+        <div class="p-4 bg-white hover:bg-gray-50/50 transition-colors">
+            <div class="flex justify-between items-start mb-2">
+                <div>
+                    <h4 class="text-sm font-black text-gray-900 leading-tight mb-1">{{ $g->troop_name }}</h4>
+                    <p class="text-xs text-gray-500">{{ $g->country }} <span class="mx-1">•</span> {{ $g->order_number }}</p>
+                </div>
+                <div class="text-right">
+                    <span class="inline-block px-2 py-1 rounded-lg bg-blue-50 text-blue-700 text-[10px] font-black uppercase">Subcamp {{ $g->subcamp }}</span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-1">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ __('Děti:') }}</span>
+                    <span class="text-sm font-bold">{{ $g->number_of_children }}</span>
+                </div>
+                <div class="flex items-center space-x-1">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ __('Vedoucí:') }}</span>
+                    <span class="text-sm font-black text-blue-600">{{ $g->number_of_leaders }}</span>
+                </div>
+            </div>
         </div>
+        @endforeach
     </div>
 </div>
 
-<div class="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
-    <div class="px-4 py-5 sm:px-6">
-        <h3 class="text-lg leading-6 font-medium text-gray-900">
-            {{ __('Tabulka: Vygenerované Cílové Skupiny (Target Groups)') }}
+<div class="bg-card shadow-xl rounded-3xl border border-theme overflow-hidden mb-8">
+    <div class="px-6 py-5 bg-gray-50/50 border-b border-gray-100">
+        <h3 class="text-lg font-black text-gray-900">
+            {{ __('Cílové Skupiny (Target Groups)') }}
         </h3>
-        <p class="mt-1 max-w-2xl text-sm text-gray-500">
-            {{ __('Zobrazeno') }} {{ $targetGroups->count() }} {{ __('celkových skupin.') }}
+        <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">
+            {{ __('Zobrazeno') }} {{ $targetGroups->count() }} {{ __('skupin po rozřazení.') }}
         </p>
     </div>
 

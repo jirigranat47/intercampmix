@@ -9,8 +9,8 @@
         <p class="text-gray-500">{{ __('Vyhledejte skupinu pro úpravu kontaktních údajů vedoucího.') }}</p>
     </div>
 
-    <div class="bg-card shadow-xl rounded-3xl p-8 border border-theme relative">
-        <div class="z-10">
+    <div class="bg-card shadow-xl rounded-3xl p-6 sm:p-8 border border-theme relative overflow-hidden">
+        <div>
             <label for="group-search" class="block text-sm font-bold text-gray-700 mb-2">{{ __('Začněte psát název skupiny nebo zemi...') }}</label>
             <div class="relative">
                 <input type="text" id="group-search" autocomplete="off" 
