@@ -65,7 +65,7 @@
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $g->country }}</td>
                     <td class="px-6 py-4 text-sm text-gray-500">{{ Str::limit($g->troop_name, 40) }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ $g->number_of_children }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-700 text-center font-black">{{ $g->number_of_leaders }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-center font-black text-main">{{ $g->number_of_leaders }}</td>
                 </tr>
                 @endforeach
             </tbody>
@@ -75,7 +75,7 @@
     <!-- Mobile Card View -->
     <div class="md:hidden divide-y divide-gray-100">
         @foreach($groups as $g)
-        <div class="p-4 bg-white hover:bg-gray-50/50 transition-colors">
+        <div class="p-4 bg-card hover:bg-gray-50/50 transition-colors">
             <div class="flex justify-between items-start mb-2">
                 <div>
                     <h4 class="text-sm font-black text-gray-900 leading-tight mb-1">{{ $g->troop_name }}</h4>
@@ -92,7 +92,7 @@
                 </div>
                 <div class="flex items-center space-x-1">
                     <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ __('Vedoucí:') }}</span>
-                    <span class="text-sm font-black text-blue-600">{{ $g->number_of_leaders }}</span>
+                    <span class="text-sm font-black text-main">{{ $g->number_of_leaders }}</span>
                 </div>
             </div>
         </div>
@@ -123,10 +123,10 @@
                     $leaderCount = $members->where('is_leader', true)->count();
                     $kidCount = $members->where('is_leader', false)->count();
                 @endphp
-                <div class="bg-white overflow-hidden shadow rounded-lg border border-gray-200">
-                    <div class="px-4 py-3 border-b border-gray-200 bg-gray-100 flex justify-between items-center">
-                        <h4 class="text-md font-bold text-indigo-700">{{ $groupName }}</h4>
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                <div class="bg-card overflow-hidden shadow-lg rounded-2xl border border-theme">
+                    <div class="px-4 py-3 border-b border-theme bg-gray-50/50 flex justify-between items-center">
+                        <h4 class="text-md font-black text-main">{{ $groupName }}</h4>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800">
                             {{ $leaderCount }} + {{ $kidCount }} {{ __('Členů') }}
                         </span>
                     </div>
@@ -136,7 +136,7 @@
                                 <li class="py-2 flex">
                                     <div class="ml-3 flex-1 flex flex-col">
                                         <div class="flex justify-between items-center">
-                                            <p class="text-sm font-medium text-gray-900">
+                                            <p class="text-sm font-bold text-main">
                                                 {{ $p->first_name }} {{ $p->last_name }} 
                                             </p>
                                             @if($p->is_leader)
