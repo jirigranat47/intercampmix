@@ -78,13 +78,22 @@ class MixerController extends Controller
                 $subcamp = $orig ? $orig->subcamp : '?';
                 $troop = $orig ? $orig->troop_name : 'Unknown';
 
+                $targetGroup = $p->target_group;
+                $regCode = $p->registration_code;
+
+                // Označení nepřiřazených vedoucí (off-duty) pro přehlednost v exportu
+                if (empty($targetGroup) && $p->is_leader) {
+                    $targetGroup = 'EXTRA_LEADER';
+                    $regCode = 'N/A';
+                }
+
                 fputcsv($file, [
-                    $p->target_group,
+                    $targetGroup,
                     $subcamp,
                     $p->original_group_id,
                     $p->country,
                     $troop,
-                    $p->registration_code
+                    $regCode
                 ], ';');
             }
 

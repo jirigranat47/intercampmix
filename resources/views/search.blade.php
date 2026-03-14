@@ -3,14 +3,13 @@
 @section('content')
 <div class="max-w-md mx-auto">
     <div class="bg-card shadow-xl rounded-2xl overflow-hidden border border-theme">
-        <div class="bg-nav px-6 py-8 text-center text-white">
-            <h1 class="text-2xl font-bold mb-2">{{ __('Najdi svou skupinu') }}</h1>
+        <div class="bg-nav pt-6 pb-2 px-8 text-center text-white">
+            <h1 class="text-2xl font-bold mb-1">{{ __('Najdi svou skupinu') }}</h1>
             <p class="text-blue-100 opacity-90">{{ __('Zadej svůj kód a zjisti, do které skupiny patříš.') }}</p>
         </div>
 
-        <div class="p-8">
-            <form action="{{ route('participant.search.submit') }}" method="POST" class="space-y-6">
-                @csrf
+        <div class="px-8 pb-8 pt-2">
+            <form action="{{ route('participant.search') }}" method="GET" class="space-y-6">
                 <div>
                     <label for="code" class="block text-sm font-medium text-gray-700 mb-2">{{ __('Kód účastníka (např. SC1_G01_1)') }}</label>
                     <input type="text" name="code" id="code" required 

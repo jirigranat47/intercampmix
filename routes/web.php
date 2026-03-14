@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', [App\Http\Controllers\ParticipantSearchController::class, 'index'])->name('participant.search');
-Route::post('/search', [App\Http\Controllers\ParticipantSearchController::class, 'search'])->name('participant.search.submit');
 
 Route::get('/admin/import', [App\Http\Controllers\Admin\ImportController::class, 'index'])->name('admin.import');
 Route::post('/admin/import', [App\Http\Controllers\Admin\ImportController::class, 'process'])->name('admin.import.process');

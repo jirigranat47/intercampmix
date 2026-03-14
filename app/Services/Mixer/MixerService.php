@@ -391,6 +391,17 @@ class MixerService
         }
         
         // Důležité: Vedoucí, kteří nebyli přiřazeni, by měli mít smazané staré rozřazení
-        // (V reálu se tabulka truncateuje při importu, ale pro jistotu)
+        // a dostat jasný příznak "EXTRA_LEADER" pro exporty a hledání.
+        Participant::where('is_leader', true)
+            ->whereNull('target_group')
+            ->whereIn('original_group_id', function($query) {
+                $query->select('order_number')->from('original_groups')->where('subcamp', $this->subcampId);
+            })
+            ->get()
+            ->each(function($leader) {
+                $leader->target_group = 'EXTRA_LEADER';
+                $leader->registration_code = 'EXTRA_L_' . $leader->id;
+                $leader->save();
+            });
     }
 }
