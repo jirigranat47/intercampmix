@@ -106,7 +106,7 @@
         })();
     </script>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-[100dvh] flex flex-col">
     
     <nav class="backdrop-blur-md text-white shadow-xl sticky top-0 z-[999] border-b border-white/10" style="background-color: var(--nav-bg-opaque, #1e40afef);">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -178,7 +178,7 @@
         @endif
     </nav>
 
-    <main class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+    <main class="flex-grow w-full max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
         @if (session('success'))
             <div class="mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
                 <span class="block sm:inline">{{ session('success') }}</span>
@@ -199,14 +199,14 @@
         @yield('content')
     </main>
 
-    <footer class="mt-auto py-8 border-t border-gray-200 bg-card">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center opacity-70 text-sm">
-            <div>
+    <footer class="w-full py-8 pb-8 md:pb-8 border-t border-gray-200 bg-card shrink-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center opacity-80 text-sm">
+            <div class="text-center md:text-left mb-6 md:mb-0">
                 &copy; {{ date('Y') }} {{ __('Intercamp Mixer - Strategické Rozřazování') }}
             </div>
-            <div class="mt-4 md:mt-0 flex space-x-4">
-                <button onclick="setLanguage('cs')" class="px-3 py-1 rounded-lg border border-theme hover:bg-secondary transition-colors font-bold" id="lang-cs">Čeština</button>
-                <button onclick="setLanguage('en')" class="px-3 py-1 rounded-lg border border-theme hover:bg-secondary transition-colors" id="lang-en">English</button>
+            <div class="flex items-center space-x-3">
+                <button onclick="setLanguage('cs')" class="px-4 py-2 rounded-lg border border-theme hover:bg-secondary transition-all font-bold" id="lang-cs">Čeština</button>
+                <button onclick="setLanguage('en')" class="px-4 py-2 rounded-lg border border-theme hover:bg-secondary transition-all" id="lang-en">English</button>
             </div>
         </div>
     </footer>

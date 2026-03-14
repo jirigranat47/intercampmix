@@ -59,7 +59,7 @@
                         <label for="leader_phone" class="block text-sm font-bold text-gray-700 mb-2">{{ __('Telefon vedoucího') }}</label>
                         <input type="text" name="leader_phone" id="leader_phone" 
                             value="{{ old('leader_phone', $group->leader_phone) }}"
-                            placeholder="+420..."
+                            placeholder="{{ __('+420...') }}"
                             required
                             class="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all font-medium font-mono">
                         <p class="mt-2 text-xs text-gray-400 italic">

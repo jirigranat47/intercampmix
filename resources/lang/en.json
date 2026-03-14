@@ -118,5 +118,13 @@
     "Zpět na hledání": "Back to Search",
     "Detaily skupiny": "Group Details",
     "Kontakt byl úspěšně aktualizován.": "Contact was successfully updated.",
-    "Telefon musí být v mezinárodním formátu začínajícím + (např. +420123456789).": "Phone must be in international format starting with + (e.g. +420123456789)."
+    "Telefon musí být v mezinárodním formátu začínajícím + (např. +420123456789).": "Phone must be in international format starting with + (e.g. +420123456789).",
+    "Vyhledejte skupinu pro úpravu kontaktních údajů vedoucího.": "Search for a group to edit the leader's contact information.",
+    "Příklad: Troop 123, Germany...": "Example: Troop 123, Germany...",
+    "Upravit kontakt": "Edit Contact",
+    "Musí začínat na + (např. +420 777 666 555)": "Must start with + (e.g., +420 777 666 555)",
+    "Vyhledávání": "Search",
+    "+420...": "+420...",
+    "Skupiny z Excelu (Original Groups)": "Original Groups (from Excel)",
+    "Cílové Skupiny (Target Groups)": "Target Groups (Generated)"
 }
