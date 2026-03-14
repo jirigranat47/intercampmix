@@ -17,6 +17,7 @@
             --border-color: #e5e7eb;
             --input-bg: #ffffff;
             --accent: #2563eb;
+            --nav-bg-opaque: rgba(30, 64, 175, 0.95);
         }
 
         [data-theme='dark'] {
@@ -29,6 +30,7 @@
             --border-color: #334155;
             --input-bg: #334155;
             --accent: #38bdf8;
+            --nav-bg-opaque: rgba(30, 41, 59, 0.95);
         }
 
         [data-theme='pink'] {
@@ -41,6 +43,7 @@
             --border-color: #fbcfe8;
             --input-bg: #ffffff;
             --accent: #db2777;
+            --nav-bg-opaque: rgba(190, 24, 93, 0.95);
         }
 
         body {
@@ -105,7 +108,7 @@
 </head>
 <body class="min-h-screen flex flex-col">
     
-    <nav class="bg-nav text-white shadow-lg">
+    <nav class="backdrop-blur-md text-white shadow-xl sticky top-0 z-[999] border-b border-white/10" style="background-color: var(--nav-bg-opaque, #1e40afef);">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-baseline">
@@ -131,11 +134,11 @@
                     </div>
                 </div>
                 
-                <!-- Theme Switcher -->
-                <div class="flex items-center space-x-2">
-                    <button onclick="setTheme('light')" class="p-1 rounded-full hover:bg-white/10" title="Light Mode">☀️</button>
-                    <button onclick="setTheme('dark')" class="p-1 rounded-full hover:bg-white/10" title="Dark Mode">🌙</button>
-                    <button onclick="setTheme('pink')" class="p-1 rounded-full hover:bg-white/10" title="Pink Mode">🌸</button>
+                <!-- Theme Switcher (Simplified) -->
+                <div class="flex items-center space-x-1 border-l border-white/20 pl-4 ml-4">
+                    <button onclick="setTheme('light')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors" title="Light">☀️</button>
+                    <button onclick="setTheme('dark')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors" title="Dark">🌙</button>
+                    <button onclick="setTheme('pink')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors" title="Pink">🌸</button>
                 </div>
 
                 @if(($userRole ?? 'none') !== 'none')
@@ -201,9 +204,9 @@
             <div>
                 &copy; {{ date('Y') }} {{ __('Intercamp Mixer - Strategické Rozřazování') }}
             </div>
-            <div class="mt-4 md:mt-0 flex space-x-6">
-                <button onclick="setLanguage('cs')" class="hover:underline font-bold" id="lang-cs">Čeština</button>
-                <button onclick="setLanguage('en')" class="hover:underline" id="lang-en">English</button>
+            <div class="mt-4 md:mt-0 flex space-x-4">
+                <button onclick="setLanguage('cs')" class="px-3 py-1 rounded-lg border border-theme hover:bg-secondary transition-colors font-bold" id="lang-cs">Čeština</button>
+                <button onclick="setLanguage('en')" class="px-3 py-1 rounded-lg border border-theme hover:bg-secondary transition-colors" id="lang-en">English</button>
             </div>
         </div>
     </footer>
@@ -216,32 +219,37 @@
 
         function setLanguage(lang) {
             localStorage.setItem('lang', lang);
-            // In a real Laravel app, we would redirect to a route that sets the locale
-            // For now, we will reload the page with a lang parameter to trigger backend change
             const url = new URL(window.location.href);
             url.searchParams.set('lang', lang);
             window.location.href = url.toString();
         }
 
         // Mobile menu toggle
-        document.getElementById('mobile-menu-button').addEventListener('click', function() {
-            const menu = document.getElementById('mobile-menu');
-            const svgs = this.querySelectorAll('svg');
-            
-            if (menu.classList.contains('hidden')) {
-                menu.classList.remove('hidden');
-                svgs[0].classList.add('hidden');
-                svgs[1].classList.remove('hidden');
-            } else {
-                menu.classList.add('hidden');
-                svgs[0].classList.remove('hidden');
-                svgs[1].classList.add('hidden');
-            }
-        });
+        const mobBtn = document.getElementById('mobile-menu-button');
+        if (mobBtn) {
+            mobBtn.addEventListener('click', function() {
+                const menu = document.getElementById('mobile-menu');
+                const svgs = this.querySelectorAll('svg');
+                
+                if (menu.classList.contains('hidden')) {
+                    menu.classList.remove('hidden');
+                    svgs[0].classList.add('hidden');
+                    svgs[1].classList.remove('hidden');
+                } else {
+                    menu.classList.add('hidden');
+                    svgs[0].classList.remove('hidden');
+                    svgs[1].classList.add('hidden');
+                }
+            });
+        }
 
         // Initialize active language appearance
         const currentLang = localStorage.getItem('lang') || (navigator.language.startsWith('cs') ? 'cs' : 'en');
-        document.getElementById('lang-' + currentLang)?.classList.add('text-blue-600', 'underline');
+        const langBtn = document.getElementById('lang-' + currentLang);
+        if (langBtn) {
+            langBtn.classList.add('bg-blue-600', 'text-white', 'border-blue-600', 'hover:bg-blue-700');
+            langBtn.classList.remove('hover:bg-secondary');
+        }
     </script>
 </body>
 
