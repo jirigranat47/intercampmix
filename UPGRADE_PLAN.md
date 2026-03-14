@@ -21,3 +21,10 @@ Tento dokument shrnuje plánované změny pro aplikaci Intercamp Mixer.
     - **E:** Telefonní číslo
 - **Zobrazení:** Tyto údaje se zobrazí na stránce výsledků hledání (po zadání kódu).
 - **Interaktivita:** Telefonní číslo bude klikatelný odkaz (`tel:`), aby bylo možné z mobilu přímo zahájit volání.
+
+## 4. Zabezpečení a Přístupové Tokeny
+- **Systém bez hesel:** Aplikace využívá přístupové tokeny v URL.
+- **Root Token:** Hlavní administrátor má token v `.env` (`ADMIN_ROOT_TOKEN`).
+- **Generování:** V administraci je modul pro tvorbu tokenů pro `Admin` (vše) a `Viewer` (pouze hledání a prohlížení DB).
+- **Persistence:** Token se ukládá do `localStorage` a zrcadlí se do cookies pro backendovou autorizaci.
+- **Autorizační odkaz:** Formát `/auth/{token}` zajistí uložení do prohlížeče a přesměrování.

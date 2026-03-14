@@ -6,8 +6,8 @@ Aplikace pro automatické a spravedlivé rozřazování účastníků do meziná
 - **Mezinárodní míchání**: Algoritmus prioritizuje unikátnost národností a skupin v rámci cílových 8-členných týmů.
 - **Import z Excelu**: Podpora nahrávání (.xlsx) s automatickou detekcí subcampů a importem údajů vedoucích.
 - **Multi-language (CZ/EN)**: Automatická detekce jazyka prohlížeče s možností manuálního přepnutí.
-- **Barevné režimy**: Light, Dark a Pink mode pro pohodlné používání na desktopu i mobilu.
-- **Veřejné hledání**: Rychlé vyhledání cílové skupiny podle kódu účastníka.
+- **Zabezpečení (Tokeny)**: Přístup chráněn pomocí unikátních tokenů uložených v `localStorage`. Podpora rolí (Admin/Viewer).
+- **Vyhledávání**: Rychlé vyhledání cílové skupiny podle kódu účastníka (dostupné pouze pro autorizované uživatele).
 
 ---
 
@@ -43,6 +43,29 @@ docker compose exec laravel.test php artisan migrate
 Případně přes Sail (.bat verze pro PowerShell): `vendor\bin\sail artisan migrate`
 
 Stav migrací ověříte příkazem: `php artisan migrate:status`
+
+---
+
+### 🔐 Zabezpečení a Přístup
+Aplikace nepoužívá klasická hesla, ale systém přístupových tokenů.
+
+#### 1. Root Token (Hlavní Admin)
+Nejvyšší oprávnění je definováno v `.env` pomocí proměnné `ADMIN_ROOT_TOKEN`. 
+- **Odkaz pro přihlášení**: `http://localhost:8000/auth/{VAS_ROOT_TOKEN}`
+- Root admin může generovat další tokeny pro ostatní uživatele v sekci "Správa Tokenů".
+
+#### 2. Role uživatelů
+- **Admin**: Přístup k importu, míchání, exportu a prohlížení dat.
+- **Viewer**: Přístup pouze k vyhledávání a prohlížení databáze (vhodné pro vedoucí subcampů).
+
+#### 3. Jak vytvořit přístupový odkaz
+1. Přihlaste se jako Root Admin.
+2. Přejděte do sekce **🔑 Správa Tokenů**.
+3. Zadejte popis a zvolte roli.
+4. Klikněte na "Vygenerovat".
+5. Zkopírujte vygenerovaný odkaz a pošlete ho uživateli.
+
+Po kliknutí na odkaz se token uloží do `localStorage` prohlížeče a přístup je trvalý, dokud se uživatel neodhlásí.
 
 ---
 

@@ -92,10 +92,13 @@
             const browserLang = navigator.language.startsWith('cs') ? 'cs' : 'en';
             const currentLang = savedLang || browserLang;
             
-            // If the URL has a lang parameter, we might want to respect it, 
-            // but the request asks for localStorage priority.
-            if (!savedLang && browserLang === 'cs' && !window.location.search.includes('lang=')) {
-                // Initial auto-detection
+            // TOKEN SYNC (localStorage -> Cookie) for PHP backend
+            const token = localStorage.getItem('access_token');
+            if (token) {
+                document.cookie = "access_token=" + token + "; path=/; max-age=" + (60 * 60 * 24 * 365);
+            } else if (document.cookie.includes('access_token=')) {
+                // If missing in localStorage but present in cookie (e.g. cleared storage), clear cookie too
+                document.cookie = "access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
             }
         })();
     </script>
@@ -110,9 +113,21 @@
                 </div>
                 <div class="hidden md:flex items-center space-x-4">
                     <div class="flex items-baseline space-x-4">
-                        <a href="/" class="hover:opacity-80 px-3 py-2 rounded-md text-sm font-medium">{{ __('Veřejné hledání') }}</a>
-                        <a href="{{ route('admin.import') }}" class="hover:opacity-80 px-3 py-2 rounded-md text-sm font-medium">{{ __('Administrace/Nahrávání') }}</a>
-                        <a href="{{ route('admin.db') }}" class="hover:opacity-80 px-3 py-2 rounded-md text-sm font-medium opacity-80">🔍 {{ __('Prohlížet databázi') }}</a>
+                        @if(($userRole ?? 'none') !== 'none')
+                            <a href="/" class="hover:opacity-80 px-3 py-2 rounded-md text-sm font-medium">{{ __('Vyhledávání') }}</a>
+                            
+                            @if($userRole === 'admin')
+                                <a href="{{ route('admin.import') }}" class="hover:opacity-80 px-3 py-2 rounded-md text-sm font-medium">{{ __('Administrace/Nahrávání') }}</a>
+                            @endif
+                            
+                            <a href="{{ route('admin.db') }}" class="hover:opacity-80 px-3 py-2 rounded-md text-sm font-medium opacity-80">🔍 {{ __('Prohlížet databázi') }}</a>
+
+                            @if($userRole === 'admin')
+                                 <a href="{{ route('admin.tokens') }}" class="hover:opacity-80 px-3 py-2 rounded-md text-sm font-medium">🔑 {{ __('Správa Tokenů') }}</a>
+                            @endif
+
+                            <a href="{{ route('auth.logout') }}" class="hover:opacity-80 px-3 py-2 rounded-md text-sm font-medium text-red-100">🚪 {{ __('Odhlásit') }}</a>
+                        @endif
                     </div>
                 </div>
                 
@@ -141,8 +156,18 @@
         <div class="hidden md:hidden" id="mobile-menu">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                 <a href="/" class="hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">{{ __('Veřejné hledání') }}</a>
-                <a href="{{ route('admin.import') }}" class="hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">{{ __('Administrace/Nahrávání') }}</a>
-                <a href="{{ route('admin.db') }}" class="hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium text-blue-200">🔍 {{ __('Prohlížet databázi') }}</a>
+                @if(($userRole ?? 'none') === 'admin')
+                    <a href="{{ route('admin.import') }}" class="hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">{{ __('Administrace/Nahrávání') }}</a>
+                @endif
+                @if(($userRole ?? 'none') !== 'none')
+                    <a href="{{ route('admin.db') }}" class="hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">🔍 {{ __('Prohlížet databázi') }}</a>
+                @endif
+                @if(($userRole ?? 'none') === 'admin')
+                    <a href="{{ route('admin.tokens') }}" class="hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">🔑 {{ __('Správa Tokenů') }}</a>
+                @endif
+                @if(($userRole ?? 'none') !== 'none')
+                    <a href="{{ route('auth.logout') }}" class="hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">🚪 {{ __('Odhlásit') }}</a>
+                @endif
             </div>
         </div>
     </nav>
