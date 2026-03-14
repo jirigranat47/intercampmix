@@ -138,6 +138,7 @@
                     <button onclick="setTheme('pink')" class="p-1 rounded-full hover:bg-white/10" title="Pink Mode">🌸</button>
                 </div>
 
+                @if(($userRole ?? 'none') !== 'none')
                 <div class="-mr-2 flex md:hidden">
                     <button id="mobile-menu-button" type="button" class="bg-blue-900 inline-flex items-center justify-center p-2 rounded-md text-gray-200 hover:text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-blue-800 focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
                         <span class="sr-only">{{ __('Otevřít hlavní menu') }}</span>
@@ -149,27 +150,26 @@
                         </svg>
                     </button>
                 </div>
+                @endif
             </div>
         </div>
 
         <!-- Mobile menu, show/hide based on menu state. -->
+        @if(($userRole ?? 'none') !== 'none')
         <div class="hidden md:hidden" id="mobile-menu">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <a href="/" class="hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">{{ __('Veřejné hledání') }}</a>
-                @if(($userRole ?? 'none') === 'admin')
+                <a href="/" class="hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">{{ __('Vyhledávání') }}</a>
+                @if($userRole === 'admin')
                     <a href="{{ route('admin.import') }}" class="hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">{{ __('Administrace/Nahrávání') }}</a>
                 @endif
-                @if(($userRole ?? 'none') !== 'none')
-                    <a href="{{ route('admin.db') }}" class="hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">🔍 {{ __('Prohlížet databázi') }}</a>
-                @endif
-                @if(($userRole ?? 'none') === 'admin')
+                <a href="{{ route('admin.db') }}" class="hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">🔍 {{ __('Prohlížet databázi') }}</a>
+                @if($userRole === 'admin')
                     <a href="{{ route('admin.tokens') }}" class="hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">🔑 {{ __('Správa Tokenů') }}</a>
                 @endif
-                @if(($userRole ?? 'none') !== 'none')
-                    <a href="{{ route('auth.logout') }}" class="hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">🚪 {{ __('Odhlásit') }}</a>
-                @endif
+                <a href="{{ route('auth.logout') }}" class="hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">🚪 {{ __('Odhlásit') }}</a>
             </div>
         </div>
+        @endif
     </nav>
 
     <main class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
