@@ -9,8 +9,15 @@
         <p class="text-gray-500">{{ __('Vyhledejte skupinu pro úpravu kontaktních údajů vedoucího.') }}</p>
     </div>
 
-    <div class="bg-card shadow-xl rounded-3xl p-6 sm:p-8 border border-theme relative overflow-hidden">
-        <div>
+    <div class="bg-card shadow-xl rounded-3xl p-6 sm:p-8 border border-theme relative">
+        <!-- Background Decoration (Clipped) -->
+        <div class="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
+            <div class="absolute -right-10 -bottom-10 opacity-5">
+                <svg class="w-64 h-64" fill="currentColor" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16a6.471 6.471 0 0 0 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path></svg>
+            </div>
+        </div>
+
+        <div class="relative z-10">
             <label for="group-search" class="block text-sm font-bold text-gray-700 mb-2">{{ __('Začněte psát název skupiny nebo zemi...') }}</label>
             <div class="relative">
                 <input type="text" id="group-search" autocomplete="off" 
@@ -21,11 +28,6 @@
                     <!-- Results will be injected here -->
                 </div>
             </div>
-        </div>
-        
-        <!-- Decoration -->
-        <div class="absolute -right-10 -bottom-10 opacity-5 pointer-events-none">
-            <svg class="w-64 h-64" fill="currentColor" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16a6.471 6.471 0 0 0 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path></svg>
         </div>
     </div>
 </div>
