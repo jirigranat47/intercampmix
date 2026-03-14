@@ -24,6 +24,7 @@
             <label for="role" class="block text-sm font-medium text-gray-700">{{ __('Role') }}</label>
             <select name="role" id="role" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                 <option value="viewer">{{ __('Prohlížení (Viewer)') }}</option>
+                <option value="subcamp_chief">{{ __('Subcamp Chief (Editace kontaktů)') }}</option>
                 <option value="admin">{{ __('Administrátor (Admin)') }}</option>
             </select>
         </div>
@@ -51,9 +52,13 @@
             <tr>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $t->description }}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm">
-                    <span class="px-2 py-1 rounded-full text-xs font-bold {{ $t->role === 'admin' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800' }}">
-                        {{ strtoupper($t->role) }}
-                    </span>
+                    @if($t->role === 'admin')
+                        <span class="px-2 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800">ADMIN</span>
+                    @elseif($t->role === 'subcamp_chief')
+                        <span class="px-2 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800">CHIEF</span>
+                    @else
+                        <span class="px-2 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800">VIEWER</span>
+                    @endif
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-500">
                    <div class="flex items-center space-x-2">

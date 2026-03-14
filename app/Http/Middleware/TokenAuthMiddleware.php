@@ -72,6 +72,23 @@ class TokenAuthMiddleware
                     return redirect('/')->withErrors(__('Nedostatečná oprávnění pro tuto akci.'));
                 }
             }
+
+            // Subcamp Chiefs can see DB, Groups/Stats, AND manage group contacts
+            if ($role === 'subcamp_chief') {
+                $allowedChiefRoutes = [
+                    'admin.db',
+                    'admin.groups',
+                    'admin.stats',
+                    'admin.groups.search',
+                    'admin.groups.autocomplete',
+                    'admin.groups.edit',
+                    'admin.groups.update'
+                ];
+                
+                if (!in_array($request->route()->getName(), $allowedChiefRoutes)) {
+                    return redirect('/')->withErrors(__('Nedostatečná oprávnění pro tuto akci.'));
+                }
+            }
         }
 
         return $next($request);

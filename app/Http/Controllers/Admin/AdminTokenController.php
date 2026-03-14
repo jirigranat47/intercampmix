@@ -28,7 +28,7 @@ class AdminTokenController extends Controller
 
         $request->validate([
             'description' => 'required|string|max:255',
-            'role' => 'required|in:admin,viewer',
+            'role' => 'required|in:admin,subcamp_chief,viewer',
         ]);
 
         AccessToken::create([

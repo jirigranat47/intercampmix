@@ -122,8 +122,8 @@
                             
                             <a href="{{ route('admin.db') }}" class="hover:opacity-80 px-3 py-2 rounded-md text-sm font-medium opacity-80">🔍 {{ __('Prohlížet databázi') }}</a>
 
-                            @if($userRole === 'admin')
-                                 <a href="{{ route('admin.tokens') }}" class="hover:opacity-80 px-3 py-2 rounded-md text-sm font-medium">🔑 {{ __('Správa Tokenů') }}</a>
+                            @if($userRole === 'admin' || $userRole === 'subcamp_chief')
+                                <a href="{{ route('admin.groups.search') }}" class="hover:opacity-80 px-3 py-2 rounded-md text-sm font-medium">📇 {{ __('Správa kontaktů') }}</a>
                             @endif
 
                             <a href="{{ route('auth.logout') }}" class="hover:opacity-80 px-3 py-2 rounded-md text-sm font-medium text-red-100">🚪 {{ __('Odhlásit') }}</a>
@@ -163,6 +163,9 @@
                     <a href="{{ route('admin.import') }}" class="hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">{{ __('Administrace/Nahrávání') }}</a>
                 @endif
                 <a href="{{ route('admin.db') }}" class="hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">🔍 {{ __('Prohlížet databázi') }}</a>
+                @if($userRole === 'admin' || $userRole === 'subcamp_chief')
+                    <a href="{{ route('admin.groups.search') }}" class="hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">📇 {{ __('Správa kontaktů') }}</a>
+                @endif
                 @if($userRole === 'admin')
                     <a href="{{ route('admin.tokens') }}" class="hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">🔑 {{ __('Správa Tokenů') }}</a>
                 @endif

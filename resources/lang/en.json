@@ -106,5 +106,17 @@
     "Přístup odepřen": "Access Denied",
     "Přístup vyžaduje autorizaci": "Authorization Required",
     "Pro vstup do aplikace musíte použít unikátní odkaz, který vám zaslal administrátor.": "To enter the application, you must use a unique link sent to you by the administrator.",
-    "Po kliknutí na váš osobní odkaz se přístup automaticky uloží do tohoto prohlížeče.": "After clicking your personal link, access will be automatically saved to this browser."
+    "Po kliknutí na váš osobní odkaz se přístup automaticky uloží do tohoto prohlížeče.": "After clicking your personal link, access will be automatically saved to this browser.",
+    "Správa kontaktů": "Manage Contacts",
+    "Subcamp Chief (Editace kontaktů)": "Subcamp Chief (Contact Editing)",
+    "Upravit kontakt skupiny": "Edit Group Contact",
+    "Začněte psát název skupiny nebo zemi...": "Start typing group name or country...",
+    "Nebyly nalezeny žádné skupiny.": "No groups found.",
+    "Jméno vedoucího": "Leader Name",
+    "Telefon vedoucího": "Leader Phone",
+    "Uložit změny": "Save Changes",
+    "Zpět na hledání": "Back to Search",
+    "Detaily skupiny": "Group Details",
+    "Kontakt byl úspěšně aktualizován.": "Contact was successfully updated.",
+    "Telefon musí být v mezinárodním formátu začínajícím + (např. +420123456789).": "Phone must be in international format starting with + (e.g. +420123456789)."
 }

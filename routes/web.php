@@ -29,4 +29,10 @@ Route::middleware(['web'])->group(function () {
     Route::get('/admin/tokens', [App\Http\Controllers\Admin\AdminTokenController::class, 'index'])->name('admin.tokens');
     Route::post('/admin/tokens', [App\Http\Controllers\Admin\AdminTokenController::class, 'store'])->name('admin.tokens.store');
     Route::delete('/admin/tokens/{id}', [App\Http\Controllers\Admin\AdminTokenController::class, 'destroy'])->name('admin.tokens.destroy');
+
+    // Group Management (Contacts)
+    Route::get('/admin/groups/search', [App\Http\Controllers\Admin\GroupManagementController::class, 'search'])->name('admin.groups.search');
+    Route::get('/admin/groups/autocomplete', [App\Http\Controllers\Admin\GroupManagementController::class, 'autocomplete'])->name('admin.groups.autocomplete');
+    Route::get('/admin/groups/{id}/edit', [App\Http\Controllers\Admin\GroupManagementController::class, 'edit'])->name('admin.groups.edit');
+    Route::put('/admin/groups/{id}', [App\Http\Controllers\Admin\GroupManagementController::class, 'update'])->name('admin.groups.update');
 });
