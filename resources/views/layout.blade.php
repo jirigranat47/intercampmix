@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>International Mixer - @yield('title')</title>
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     <!-- Tailwind CSS included via CDN for rapid proto, as it fits your requests -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -127,6 +128,10 @@
 
                             @if($userRole === 'admin' || $userRole === 'subcamp_chief')
                                 <a href="{{ route('admin.groups.search') }}" class="hover:opacity-80 px-3 py-2 rounded-md text-sm font-medium">📇 {{ __('Správa kontaktů') }}</a>
+                            @endif
+
+                            @if($userRole === 'admin')
+                                <a href="{{ route('admin.tokens') }}" class="hover:opacity-80 px-3 py-2 rounded-md text-sm font-medium">🔑 {{ __('Správa Tokenů') }}</a>
                             @endif
 
                             <a href="{{ route('auth.logout') }}" class="hover:opacity-80 px-3 py-2 rounded-md text-sm font-medium text-red-100">🚪 {{ __('Odhlásit') }}</a>
