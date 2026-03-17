@@ -110,31 +110,31 @@
 <body class="min-h-[100dvh] flex flex-col">
     
     <nav class="backdrop-blur-md text-white shadow-xl sticky top-0 z-[999] border-b border-white/10" style="background-color: var(--nav-bg-opaque, #1e40afef);">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
-                <div class="flex items-baseline">
-                    <a href="/" class="text-xl font-bold tracking-wider">🏕️ Intercamp Mixer</a>
+                <div class="flex items-center space-x-4 shrink-0">
+                    <a href="/" class="text-xl font-bold tracking-wider whitespace-nowrap">🏕️ Intercamp Mixer</a>
                 </div>
-                <div class="hidden md:flex items-center space-x-4">
-                    <div class="flex items-baseline space-x-4">
+                <div class="hidden md:flex items-center space-x-2 lg:space-x-4">
+                    <div class="flex items-baseline space-x-1 lg:space-x-2">
                         @if(($userRole ?? 'none') !== 'none')
-                            <a href="/" class="hover:opacity-80 px-3 py-2 rounded-md text-sm font-medium">{{ __('Vyhledávání') }}</a>
+                            <a href="/" class="hover:opacity-80 px-2 py-2 rounded-md text-sm font-medium whitespace-nowrap">{{ __('Vyhledávání') }}</a>
                             
                             @if($userRole === 'admin')
-                                <a href="{{ route('admin.import') }}" class="hover:opacity-80 px-3 py-2 rounded-md text-sm font-medium">{{ __('Administrace/Nahrávání') }}</a>
+                                <a href="{{ route('admin.import') }}" class="hover:opacity-80 px-2 py-2 rounded-md text-sm font-medium whitespace-nowrap">{{ __('Administrace/Nahrávání') }}</a>
                             @endif
                             
-                            <a href="{{ route('admin.db') }}" class="hover:opacity-80 px-3 py-2 rounded-md text-sm font-medium opacity-80">🔍 {{ __('Prohlížet databázi') }}</a>
+                            <a href="{{ route('admin.db') }}" class="hover:opacity-80 px-2 py-2 rounded-md text-sm font-medium opacity-80 whitespace-nowrap">🔍 {{ __('Prohlížet databázi') }}</a>
 
                             @if($userRole === 'admin' || $userRole === 'subcamp_chief')
-                                <a href="{{ route('admin.groups.search') }}" class="hover:opacity-80 px-3 py-2 rounded-md text-sm font-medium">📇 {{ __('Správa kontaktů') }}</a>
+                                <a href="{{ route('admin.groups.search') }}" class="hover:opacity-80 px-2 py-2 rounded-md text-sm font-medium whitespace-nowrap">📇 {{ __('Správa kontaktů') }}</a>
                             @endif
 
                             @if($userRole === 'admin')
-                                <a href="{{ route('admin.tokens') }}" class="hover:opacity-80 px-3 py-2 rounded-md text-sm font-medium">🔑 {{ __('Správa Tokenů') }}</a>
+                                <a href="{{ route('admin.tokens') }}" class="hover:opacity-80 px-2 py-2 rounded-md text-sm font-medium whitespace-nowrap">🔑 {{ __('Správa Tokenů') }}</a>
                             @endif
 
-                            <a href="{{ route('auth.logout') }}" class="hover:opacity-80 px-3 py-2 rounded-md text-sm font-medium text-red-100">🚪 {{ __('Odhlásit') }}</a>
+                            <a href="{{ route('auth.logout') }}" class="hover:opacity-80 px-2 py-2 rounded-md text-sm font-medium text-red-100 whitespace-nowrap">🚪 {{ __('Odhlásit') }}</a>
                         @endif
                     </div>
                 </div>
