@@ -11,7 +11,7 @@
         <div class="px-8 pb-8 pt-2">
             <form action="{{ route('participant.search') }}" method="GET" class="space-y-6">
                 <div>
-                    <label for="code" class="block text-sm font-medium text-gray-700 mb-2">{{ __('Kód účastníka (např. SC1_G01_1)') }}</label>
+                    <label for="code" class="block text-sm font-medium text-gray-700 mb-2">{{ __('Kód účastníka (např. S1-17-7)') }}</label>
                     <input type="text" name="code" id="code" required 
                         placeholder="{{ __('Zadejte kód') }}" 
                         value="{{ old('code', $code ?? '') }}"

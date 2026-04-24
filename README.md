@@ -8,6 +8,7 @@ Aplikace pro automatické a spravedlivé rozřazování účastníků do meziná
 - **Multi-language (CZ/EN)**: Automatická detekce jazyka prohlížeče s možností manuálního přepnutí.
 - **Zabezpečení (Tokeny)**: Přístup chráněn pomocí unikátních tokenů uložených v `localStorage`. Podpora rolí (Admin/Viewer).
 - **Vyhledávání**: Rychlé vyhledání cílové skupiny podle kódu účastníka (dostupné pouze pro autorizované uživatele).
+- **Formát kódů**: `S{subcamp}-{skupina}-{pořadí/X}` (např. `S1-17-7` pro účastníka nebo `S1-17-X` pro vedoucího).
 
 ---
 
@@ -87,3 +88,18 @@ Témata jsou definována pomocí CSS proměnných v `:root`, `[data-theme='dark'
 ## 📈 Export a Analýza
 - **CSV Export**: Dostupný v administraci po spuštění míchacího algoritmu.
 - **Diverzita**: Skript `analyze.php` slouží k hloubkové kontrole kvality promíchání národností.
+
+---
+
+## 🛠️ Algoritmus a Formát Dat
+
+### Rozřazovací Kódy
+Aplikace generuje unikátní označení pro každého účastníka ve formátu `S{subcamp}-{skupina}-{index}`.
+
+- **S**: Prefix pro Subcamp.
+- **{subcamp}**: ID subcampu (1 až 4).
+- **-**: Oddělovač (pomlčka).
+- **{skupina}**: Dvoumístné číslo mixované skupiny (např. `01`, `17`).
+- **{index}**: Pořadové číslo dítěte v rámci skupiny (`1` až `8`) nebo písmeno `X` pro vedoucího výpravy.
+
+**Příklad:** `S1-17-7` (Subcamp 1, skupina 17, 7. dítě) | `S1-17-X` (Vedoucí skupiny S1-17).

@@ -209,6 +209,9 @@
             <div class="text-center md:text-left mb-6 md:mb-0">
                 &copy; {{ date('Y') }} {{ __('Intercamp Mixer - Strategické Rozřazování') }}
             </div>
+            <div class="mb-6 md:mb-0">
+                <a href="{{ route('help') }}" class="hover:text-blue-600 transition-colors font-medium border-b border-transparent hover:border-blue-600 pb-0.5">❓ {{ __('Nápověda') }}</a>
+            </div>
             <div class="flex items-center space-x-3">
                 <button onclick="setLanguage('cs')" class="px-4 py-2 rounded-lg border border-theme hover:bg-secondary transition-all font-bold" id="lang-cs">Čeština</button>
                 <button onclick="setLanguage('en')" class="px-4 py-2 rounded-lg border border-theme hover:bg-secondary transition-all" id="lang-en">English</button>

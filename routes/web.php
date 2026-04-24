@@ -17,6 +17,7 @@ Route::get('/', [App\Http\Controllers\ParticipantSearchController::class, 'index
 
 Route::get('/auth/{token}', [App\Http\Controllers\AuthController::class, 'login'])->name('auth.login');
 Route::get('/logout', [App\Http\Controllers\AuthController::class, 'logout'])->name('auth.logout');
+Route::get('/help', [App\Http\Controllers\HelpController::class, 'index'])->name('help');
 
 Route::middleware(['web'])->group(function () {
     Route::get('/admin/import', [App\Http\Controllers\Admin\ImportController::class, 'index'])->name('admin.import');

@@ -136,7 +136,7 @@ class MixerService
 
         $buckets = [];
         for ($i = 1; $i <= $bucketCount; $i++) {
-            $bucketName = "SC" . $this->subcampId . "_G" . str_pad($i, 2, '0', STR_PAD_LEFT);
+            $bucketName = "S" . $this->subcampId . "-" . str_pad($i, 2, '0', STR_PAD_LEFT);
             $buckets[$bucketName] = [
                 'name' => $bucketName,
                 'size' => 0,
@@ -218,7 +218,7 @@ class MixerService
                             $stats['groups_created']++;
                             $stats['tier4']++; // extra penalty note
                             $newBucketId = count($buckets) + 1;
-                            $bucketName = "SC" . $this->subcampId . "_G" . str_pad($newBucketId, 2, '0', STR_PAD_LEFT);
+                            $bucketName = "S" . $this->subcampId . "-" . str_pad($newBucketId, 2, '0', STR_PAD_LEFT);
                             $buckets[$bucketName] = [
                                 'name' => $bucketName,
                                 'size' => 0,
@@ -375,7 +375,7 @@ class MixerService
             foreach ($bucket['bundles'] as $bundle) {
                 foreach ($bundle->participants as $participant) {
                     $participant->target_group = $bucket['name'];
-                    $participant->registration_code = $bucket['name'] . "_" . $ordinal;
+                    $participant->registration_code = $bucket['name'] . "-" . $ordinal;
                     $participant->save();
                     $ordinal++;
                 }
@@ -385,7 +385,7 @@ class MixerService
             if ($bucket['leader']) {
                 $leader = $bucket['leader'];
                 $leader->target_group = $bucket['name'];
-                $leader->registration_code = $bucket['name'] . "_X";
+                $leader->registration_code = $bucket['name'] . "-X";
                 $leader->save();
             }
         }
