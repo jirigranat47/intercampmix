@@ -103,6 +103,21 @@
                     </div>
                 </div>
             </div>
+            <!-- Feature 3: Manual Swap -->
+            <div class="bg-card p-6 rounded-2xl border border-theme shadow-sm shadow-blue-500/5">
+                <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                    <div class="space-y-2">
+                        <h3 class="font-bold text-xl flex items-center gap-2">🔄 {{ __('feat_swap_title') }}</h3>
+                        <p class="text-gray-500 text-sm leading-relaxed">{{ __('feat_swap_desc') }}</p>
+                    </div>
+                    <div class="shrink-0">
+                        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-2">{{ __('Povoleno pro:') }}</span>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-2 py-1 bg-blue-100 text-blue-600 text-[10px] font-bold rounded-md uppercase">Admin</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <!-- Feature 4 -->
             <div class="bg-card p-6 rounded-2xl border border-theme shadow-sm">
                 <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">

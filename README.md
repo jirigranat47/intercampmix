@@ -8,6 +8,7 @@ Aplikace pro automatické a spravedlivé rozřazování účastníků do meziná
 - **Multi-language (CZ/EN)**: Automatická detekce jazyka prohlížeče s možností manuálního přepnutí.
 - **Zabezpečení (Tokeny)**: Přístup chráněn pomocí unikátních tokenů uložených v `localStorage`. Podpora rolí (Admin/Viewer).
 - **Vyhledávání**: Rychlé vyhledání cílové skupiny podle kódu účastníka (dostupné pouze pro autorizované uživatele).
+- **Manuální prohození**: Možnost administrátora ručně vyměnit dva účastníky mezi skupinami pro doladění výsledků míchání.
 - **Formát kódů**: `S{subcamp}-{skupina}-{pořadí/X}` (např. `S1-17-7` pro účastníka nebo `S1-17-X` pro vedoucího).
 
 ---

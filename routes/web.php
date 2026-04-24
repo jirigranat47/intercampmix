@@ -35,5 +35,10 @@ Route::middleware(['web'])->group(function () {
     Route::get('/admin/groups/search', [App\Http\Controllers\Admin\GroupManagementController::class, 'search'])->name('admin.groups.search');
     Route::get('/admin/groups/autocomplete', [App\Http\Controllers\Admin\GroupManagementController::class, 'autocomplete'])->name('admin.groups.autocomplete');
     Route::get('/admin/groups/{id}/edit', [App\Http\Controllers\Admin\GroupManagementController::class, 'edit'])->name('admin.groups.edit');
-    Route::put('/admin/groups/{id}', [App\Http\Controllers\Admin\GroupManagementController::class, 'update'])->name('admin.groups.update');
+     Route::put('/admin/groups/{id}', [App\Http\Controllers\Admin\GroupManagementController::class, 'update'])->name('admin.groups.update');
+
+    // Manual Swap
+    Route::get('/admin/swap', [App\Http\Controllers\Admin\ParticipantSwapController::class, 'index'])->name('admin.swap.index');
+    Route::get('/admin/swap/search', [App\Http\Controllers\Admin\ParticipantSwapController::class, 'search'])->name('admin.swap.search');
+    Route::post('/admin/swap', [App\Http\Controllers\Admin\ParticipantSwapController::class, 'swap'])->name('admin.swap.process');
 });
