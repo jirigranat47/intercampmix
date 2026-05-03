@@ -122,7 +122,7 @@
                             
                             @if($userRole === 'admin')
                                 <a href="{{ route('admin.import') }}" class="hover:opacity-80 px-2 py-2 rounded-md text-sm font-medium whitespace-nowrap">{{ __('Administrace/Nahrávání') }}</a>
-                                <a href="{{ route('admin.swap.index') }}" class="hover:opacity-80 px-2 py-2 rounded-md text-sm font-medium whitespace-nowrap">🔄 {{ __('Manuální prohození') }}</a>
+                                <a href="{{ route('admin.swap.index') }}" class="hover:opacity-80 px-2 py-2 rounded-md text-sm font-medium whitespace-nowrap">🔄 {{ __('Manuální přesun') }}</a>
                             @endif
                             
                             <a href="{{ route('admin.db') }}" class="hover:opacity-80 px-2 py-2 rounded-md text-sm font-medium opacity-80 whitespace-nowrap">🔍 {{ __('Prohlížet databázi') }}</a>
@@ -170,7 +170,7 @@
                 <a href="/" class="hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">{{ __('Vyhledávání') }}</a>
                 @if($userRole === 'admin')
                     <a href="{{ route('admin.import') }}" class="hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">{{ __('Administrace/Nahrávání') }}</a>
-                    <a href="{{ route('admin.swap.index') }}" class="hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">🔄 {{ __('Manuální prohození') }}</a>
+                    <a href="{{ route('admin.swap.index') }}" class="hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">🔄 {{ __('Manuální přesun') }}</a>
                 @endif
                 <a href="{{ route('admin.db') }}" class="hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">🔍 {{ __('Prohlížet databázi') }}</a>
                 @if($userRole === 'admin' || $userRole === 'subcamp_chief')

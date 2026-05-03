@@ -11,7 +11,13 @@ class ParticipantSwapController extends Controller
 {
     public function index()
     {
-        return view('admin.swap');
+        $targetGroups = Participant::whereNotNull('target_group')
+            ->distinct()
+            ->pluck('target_group')
+            ->sort()
+            ->values();
+
+        return view('admin.swap', compact('targetGroups'));
     }
 
     public function search(Request $request)
@@ -44,52 +50,34 @@ class ParticipantSwapController extends Controller
     {
         $request->validate([
             'p1_id' => 'required|exists:participants,id',
-            'p2_id' => 'required|exists:participants,id',
+            'target_group' => 'required|string',
         ]);
 
         $p1 = Participant::with('originalGroup')->findOrFail($request->p1_id);
-        $p2 = Participant::with('originalGroup')->findOrFail($request->p2_id);
+        $newGroup = trim($request->target_group);
 
-        if ($p1->id === $p2->id) {
-            return back()->withErrors(__('Nelze prohodit účastníka se sebou samým.'));
-        }
-
-        // Validation: Must be in the same subcamp
-        $sc1 = $p1->originalGroup->subcamp ?? null;
-        $sc2 = $p2->originalGroup->subcamp ?? null;
-
-        if ($sc1 !== $sc2) {
-            return back()->withErrors(__('Účastníci musí být ve stejném subcampu.'));
+        // Volitelná validace: zjistit zda skupina existuje
+        $groupExists = Participant::where('target_group', $newGroup)->exists();
+        if (!$groupExists && $newGroup !== 'EXTRA_LEADER') {
+            return back()->withErrors(__('Cílová skupina neexistuje. Zkontrolujte prosím překlepy.'));
         }
 
         try {
-            DB::transaction(function() use ($p1, $p2) {
-                // Store values
-                $code1 = $p1->registration_code;
-                $group1 = $p1->target_group;
+            DB::transaction(function() use ($p1, $newGroup) {
+                $p1->target_group = $newGroup;
                 
-                $code2 = $p2->registration_code;
-                $group2 = $p2->target_group;
-
-                // 1. Give P1 a temporary code to free up its code for P2
-                $p1->registration_code = 'TEMP_SWAP_' . $p1->id . '_' . time();
-                $p1->save();
-
-                // 2. Give P2 the original values of P1
-                $p2->registration_code = $code1;
-                $p2->target_group = $group1;
-                $p2->save();
-
-                // 3. Give P1 the original values of P2
-                $p1->registration_code = $code2;
-                $p1->target_group = $group2;
+                // Přidělíme nový registrační kód (např. cílová skupina + M (Moved) + ID)
+                // Leader má navíc L, aby bylo jasné, že je vedoucí
+                $suffix = $p1->is_leader ? '-L' : '-M';
+                $p1->registration_code = $newGroup . $suffix . $p1->id;
+                
                 $p1->save();
             });
 
-            return redirect()->route('admin.swap.index')->with('success', __('Účastníci byli úspěšně prohozeni.'));
+            return redirect()->route('admin.swap.index')->with('success', __('Účastník byl úspěšně přesunut do nové skupiny.'));
 
         } catch (\Exception $e) {
-            return back()->withErrors(__('Nastala chyba při prohazování: ') . $e->getMessage());
+            return back()->withErrors(__('Nastala chyba při přesunu: ') . $e->getMessage());
         }
     }
 }

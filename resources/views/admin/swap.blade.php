@@ -1,12 +1,12 @@
 @extends('layout')
 
-@section('title', __('Manuální prohození účastníků'))
+@section('title', __('Manuální přesun účastníka'))
 
 @section('content')
 <div class="max-w-5xl mx-auto space-y-12 pb-12">
     <div>
-        <h1 class="text-4xl font-black text-gray-900 tracking-tight">{{ __('Manuální prohození') }}</h1>
-        <p class="text-lg text-gray-500 mt-2">{{ __('Vyhledejte dva účastníky pro jejich prohození mezi skupinami. Účastníci musí být ve stejném subcampu.') }}</p>
+        <h1 class="text-4xl font-black text-gray-900 tracking-tight">{{ __('Manuální přesun účastníka') }}</h1>
+        <p class="text-lg text-gray-500 mt-2">{{ __('Vyhledejte účastníka a přesměrujte jej do jiné cílové skupiny.') }}</p>
     </div>
 
     @if($errors->any())
@@ -27,13 +27,13 @@
         </div>
     @endif
 
-    <form action="{{ route('admin.swap.process') }}" method="POST" id="swap-form" onsubmit="return confirm('{{ __('Opravdu chcete tyto dva účastníky prohodit? Tato akce okamžitě změní jejich cílové skupiny a registrační kódy.') }}')">
+    <form action="{{ route('admin.swap.process') }}" method="POST" id="swap-form" onsubmit="return confirm('{{ __('Opravdu chcete tohoto účastníka přesunout? Tato akce okamžitě změní jeho cílovou skupinu a registrační kód.') }}')">
         @csrf
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 relative">
             <!-- Center Decoration -->
             <div class="hidden lg:flex absolute inset-0 items-center justify-center pointer-events-none">
                 <div class="w-16 h-16 bg-white rounded-full border-4 border-gray-100 shadow-xl flex items-center justify-center text-3xl z-10">
-                    🔄
+                    ➡️
                 </div>
             </div>
 
@@ -42,7 +42,7 @@
                 <div class="bg-card shadow-2xl rounded-[2.5rem] p-8 border border-theme relative">
                     <div class="absolute -right-8 -top-8 w-24 h-24 bg-blue-500/5 rounded-full"></div>
                     
-                    <label class="block text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4">{{ __('Účastník A') }}</label>
+                    <label class="block text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4">{{ __('Účastník k přesunu') }}</label>
                     <div class="relative">
                         <input type="text" id="p1-search" autocomplete="off"
                             placeholder="{{ __('Kód, jméno nebo příjmení...') }}"
@@ -58,23 +58,28 @@
                 </div>
             </div>
 
-            <!-- Participant 2 -->
+            <!-- Target Group -->
             <div class="space-y-6">
                 <div class="bg-card shadow-2xl rounded-[2.5rem] p-8 border border-theme relative">
-                    <div class="absolute -right-8 -top-8 w-24 h-24 bg-blue-500/5 rounded-full"></div>
+                    <div class="absolute -right-8 -top-8 w-24 h-24 bg-green-500/5 rounded-full"></div>
 
-                    <label class="block text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4">{{ __('Účastník B') }}</label>
+                    <label class="block text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4">{{ __('Cílová skupina') }}</label>
                     <div class="relative">
-                        <input type="text" id="p2-search" autocomplete="off"
-                            placeholder="{{ __('Kód, jméno nebo příjmení...') }}"
-                            class="w-full px-6 py-4 rounded-2xl border-2 border-gray-100 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all text-lg font-bold">
-                        <div id="p2-results" class="hidden absolute left-0 right-0 z-50 mt-2 bg-white border border-gray-200 rounded-2xl shadow-3xl max-h-72 overflow-y-auto"></div>
+                        <input type="text" name="target_group" id="target-group" list="available-groups" autocomplete="off"
+                            placeholder="{{ __('např. S1-05') }}"
+                            class="w-full px-6 py-4 rounded-2xl border-2 border-gray-100 focus:border-green-500 focus:ring-4 focus:ring-green-500/10 transition-all text-lg font-bold">
+                        
+                        <datalist id="available-groups">
+                            @if(isset($targetGroups))
+                                @foreach($targetGroups as $g)
+                                    <option value="{{ $g }}"></option>
+                                @endforeach
+                            @endif
+                        </datalist>
                     </div>
 
-                    <input type="hidden" name="p2_id" id="p2-id">
-                    
-                    <div id="p2-info" class="mt-8 p-6 bg-secondary rounded-3xl border border-theme hidden transform transition-all">
-                        <!-- Details will be injected -->
+                    <div class="mt-8 p-6 bg-secondary rounded-3xl border border-theme text-sm text-gray-500">
+                        {{ __('Zadejte nebo vyberte existující cílovou skupinu, do které chcete vybraného účastníka přesunout.') }}
                     </div>
                 </div>
             </div>
@@ -83,8 +88,8 @@
         <div class="mt-16 flex justify-center">
             <button type="submit" id="submit-btn" disabled
                 class="group px-16 py-6 bg-blue-800 text-white rounded-3xl font-black text-2xl shadow-[0_20px_50px_rgba(30,58,138,0.3)] hover:bg-blue-900 transition-all hover:scale-105 active:scale-95 disabled:opacity-30 disabled:pointer-events-none disabled:grayscale">
-                <span class="inline-block transition-transform group-hover:rotate-180 duration-500 mr-2">🔄</span>
-                {{ __('Prohodit účastníky') }}
+                <span class="inline-block transition-transform group-hover:translate-x-2 duration-500 mr-2">🚀</span>
+                {{ __('Přesunout účastníka') }}
             </button>
         </div>
     </form>
@@ -93,7 +98,9 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     setupAutocomplete('p1');
-    setupAutocomplete('p2');
+    
+    const targetGroupInput = document.getElementById('target-group');
+    targetGroupInput.addEventListener('input', checkValidity);
 
     function setupAutocomplete(prefix) {
         const input = document.getElementById(`${prefix}-search`);
@@ -185,10 +192,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function checkValidity() {
         const p1Id = document.getElementById('p1-id').value;
-        const p2Id = document.getElementById('p2-id').value;
+        const targetGroup = document.getElementById('target-group').value.trim();
         const btn = document.getElementById('submit-btn');
 
-        if (p1Id && p2Id && p1Id !== p2Id) {
+        if (p1Id && targetGroup.length > 0) {
             btn.disabled = false;
         } else {
             btn.disabled = true;

@@ -8,7 +8,7 @@ Aplikace pro automatické a spravedlivé rozřazování účastníků do meziná
 - **Multi-language (CZ/EN)**: Automatická detekce jazyka prohlížeče s možností manuálního přepnutí.
 - **Zabezpečení (Tokeny)**: Přístup chráněn pomocí unikátních tokenů uložených v `localStorage`. Podpora rolí (Admin/Viewer).
 - **Vyhledávání**: Rychlé vyhledání cílové skupiny podle kódu účastníka (dostupné pouze pro autorizované uživatele).
-- **Manuální prohození**: Možnost administrátora ručně vyměnit dva účastníky mezi skupinami pro doladění výsledků míchání.
+- **Manuální přesun**: Možnost administrátora ručně přesunout účastníka do specifické cílové skupiny pro doladění výsledků míchání.
 - **Formát kódů**: `S{subcamp}-{skupina}-{pořadí/X}` (např. `S1-17-7` pro účastníka nebo `S1-17-X` pro vedoucího).
 
 ---
@@ -104,3 +104,8 @@ Aplikace generuje unikátní označení pro každého účastníka ve formátu `
 - **{index}**: Pořadové číslo dítěte v rámci skupiny (`1` až `8`) nebo písmeno `X` pro vedoucího výpravy.
 
 **Příklad:** `S1-17-7` (Subcamp 1, skupina 17, 7. dítě) | `S1-17-X` (Vedoucí skupiny S1-17).
+
+---
+
+## 📜 Historie změn
+- **03.05.2026**: Změna funkce z "Manuální prohození" na "Manuální přesun". Umožňuje rychlejší výběr účastníka a jeho přesunutí přímo do zadané cílové skupiny. Účastník navíc automaticky obdrží unikátní přesunový registrační kód.
