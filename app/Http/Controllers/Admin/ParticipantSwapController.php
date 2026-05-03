@@ -66,10 +66,35 @@ class ParticipantSwapController extends Controller
             DB::transaction(function() use ($p1, $newGroup) {
                 $p1->target_group = $newGroup;
                 
-                // Přidělíme nový registrační kód (např. cílová skupina + M (Moved) + ID)
-                // Leader má navíc L, aby bylo jasné, že je vedoucí
-                $suffix = $p1->is_leader ? '-L' : '-M';
-                $p1->registration_code = $newGroup . $suffix . $p1->id;
+                // Zjistíme jaké kódy už ve skupině jsou
+                $existingCodes = Participant::where('target_group', $newGroup)->pluck('registration_code');
+                $maxIndex = 0;
+                $hasLeaderX = false;
+
+                foreach ($existingCodes as $code) {
+                    $parts = explode('-', $code);
+                    $lastPart = end($parts);
+                    
+                    if (strtoupper($lastPart) === 'X') {
+                        $hasLeaderX = true;
+                    } elseif (is_numeric($lastPart)) {
+                        $maxIndex = max($maxIndex, (int) $lastPart);
+                    }
+                }
+
+                // Pokud je přesouvaná osoba vedoucí a skupina ještě nemá svého "X" vedoucího
+                if ($p1->is_leader && !$hasLeaderX) {
+                    $p1->registration_code = $newGroup . '-X';
+                } else {
+                    // Jinak přidělíme další volné číslo (např. 8 pokud je max 7)
+                    $newIndex = $maxIndex + 1;
+                    
+                    // Podpora pro případné nuly na začátku (jak zaznělo v požadavku S2-01-08)
+                    // Pokud už ve skupině nějaké nuly jsou, můžeme to detekovat, ale pro jistotu 
+                    // se budeme držet standardu a přidáme případně padování, pokud to uživatel tak zamýšlel.
+                    // Ale dle readme je to 'S1-17-7', takže necháme bez padování.
+                    $p1->registration_code = $newGroup . '-' . $newIndex;
+                }
                 
                 $p1->save();
             });

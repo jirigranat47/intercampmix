@@ -108,4 +108,5 @@ Aplikace generuje unikátní označení pro každého účastníka ve formátu `
 ---
 
 ## 📜 Historie změn
-- **03.05.2026**: Změna funkce z "Manuální prohození" na "Manuální přesun". Umožňuje rychlejší výběr účastníka a jeho přesunutí přímo do zadané cílové skupiny. Účastník navíc automaticky obdrží unikátní přesunový registrační kód.
+- **04.05.2026**: Aktualizace logiky přesunu: Přesunutá osoba nyní automaticky získá správný registrační kód odpovídající cílové skupině. Systém dynamicky spočítá, jaké číslo má následovat (např. po nejvyšším členovi 7 přiřadí 8). Pokud se přesouvá vedoucí do skupiny bez vedoucího, získá kód "X".
+- **03.05.2026**: Změna funkce z "Manuální prohození" na "Manuální přesun". Umožňuje rychlejší výběr účastníka a jeho přesunutí přímo do zadané cílové skupiny.
