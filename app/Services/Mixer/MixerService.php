@@ -400,7 +400,7 @@ class MixerService
             ->get()
             ->each(function($leader) {
                 $leader->target_group = 'EXTRA_LEADER';
-                $leader->registration_code = 'EXTRA_L_' . $leader->id;
+                $leader->registration_code = 'S' . $this->subcampId . '-' . $leader->id . '-L';
                 $leader->save();
             });
     }

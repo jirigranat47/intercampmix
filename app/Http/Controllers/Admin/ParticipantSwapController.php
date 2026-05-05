@@ -82,8 +82,12 @@ class ParticipantSwapController extends Controller
                     }
                 }
 
-                // Pokud je přesouvaná osoba vedoucí a skupina ještě nemá svého "X" vedoucího
-                if ($p1->is_leader && !$hasLeaderX) {
+                // Pokud jde o nezařazeného vedoucího (EXTRA_LEADER), použijeme speciální formát s identifikací subcampu
+                if ($newGroup === 'EXTRA_LEADER') {
+                    $subcamp = $p1->originalGroup->subcamp ?? '?';
+                    $p1->registration_code = 'S' . $subcamp . '-' . $p1->id . '-L';
+                } elseif ($p1->is_leader && !$hasLeaderX) {
+                    // Pokud je přesouvaná osoba vedoucí a skupina ještě nemá svého "X" vedoucího
                     $p1->registration_code = $newGroup . '-X';
                 } else {
                     // Jinak přidělíme další volné číslo (např. 8 pokud je max 7)
